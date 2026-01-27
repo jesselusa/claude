@@ -17,7 +17,8 @@ jl-claude-assistant/
 ├── CLAUDE.md          # This file - global preferences
 ├── mcp-servers/       # MCP server configurations
 ├── hooks/             # Custom automation hooks
-└── templates/         # CLAUDE.md templates for different project types
+├── templates/         # CLAUDE.md templates for different project types
+└── workflows/         # AI dev workflow templates (PRD → Tasks → Execute)
 ```
 
 ## Personal Preferences
@@ -34,3 +35,13 @@ jl-claude-assistant/
 - Comments only when logic isn't self-evident
 - Prefer simple solutions over clever ones
 - Keep files focused and small
+
+## Development Workflow
+
+For non-trivial features, follow this structured process:
+
+1. **Create PRD** - `Use @workflows/create-prd.md to build: [feature description]`
+2. **Generate Tasks** - `Create tasks from @tasks/prd-[feature].md using @workflows/generate-tasks.md`
+3. **Execute** - Work through tasks incrementally, checking off as completed
+
+This ensures clear requirements before coding and manageable incremental progress.
