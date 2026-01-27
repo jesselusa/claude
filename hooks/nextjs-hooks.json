@@ -1,0 +1,40 @@
+{
+  "hooks": [
+    {
+      "matcher": {
+        "tool": "Edit",
+        "file": "**/*.{ts,tsx}"
+      },
+      "hooks": [
+        {
+          "type": "PostToolUse",
+          "command": "npm run lint --silent 2>&1 | head -20 || true"
+        }
+      ]
+    },
+    {
+      "matcher": {
+        "tool": "Write",
+        "file": "**/*.{ts,tsx}"
+      },
+      "hooks": [
+        {
+          "type": "PostToolUse",
+          "command": "npm run lint --silent 2>&1 | head -20 || true"
+        }
+      ]
+    },
+    {
+      "matcher": {
+        "tool": "Bash",
+        "command": "git commit*"
+      },
+      "hooks": [
+        {
+          "type": "PreToolUse",
+          "command": "npm run build --silent && echo 'Build passed' || (echo 'Build failed - fix errors before committing' && exit 1)"
+        }
+      ]
+    }
+  ]
+}

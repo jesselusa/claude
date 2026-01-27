@@ -1,0 +1,40 @@
+{
+  "hooks": [
+    {
+      "matcher": {
+        "tool": "Edit",
+        "file": "**/*.py"
+      },
+      "hooks": [
+        {
+          "type": "PostToolUse",
+          "command": "ruff check --fix --silent . 2>&1 | head -20 || true"
+        }
+      ]
+    },
+    {
+      "matcher": {
+        "tool": "Write",
+        "file": "**/*.py"
+      },
+      "hooks": [
+        {
+          "type": "PostToolUse",
+          "command": "ruff check --fix --silent . 2>&1 | head -20 || true"
+        }
+      ]
+    },
+    {
+      "matcher": {
+        "tool": "Bash",
+        "command": "git commit*"
+      },
+      "hooks": [
+        {
+          "type": "PreToolUse",
+          "command": "python -m pytest -q 2>&1 | tail -10 || (echo 'Tests failed - fix before committing' && exit 1)"
+        }
+      ]
+    }
+  ]
+}
