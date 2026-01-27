@@ -18,10 +18,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-npm run dev      # Start development server (localhost:3000)
-npm run build    # Production build
-npm run lint     # Run ESLint
-npm run test     # Run tests (if configured)
+pnpm dev         # Start development server (localhost:3000)
+pnpm build       # Production build (runs lint + type-check first)
+pnpm lint        # Run ESLint
+pnpm type-check  # Run TypeScript compiler check
+pnpm test        # Run tests (if configured)
 ```
 
 ## Project Structure
@@ -47,3 +48,5 @@ lib/
 - Colocate components with their routes when feature-specific
 - Keep API routes thin - business logic in lib/
 - Use Supabase RLS for authorization
+- Use tabs for indentation
+- Commit format: `type: description` (feat, fix, refactor, docs, test, chore)

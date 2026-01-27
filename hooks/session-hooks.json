@@ -1,0 +1,19 @@
+{
+  "hooks": [
+    {
+      "matcher": {
+        "event": "SessionStart"
+      },
+      "hooks": [
+        {
+          "type": "command",
+          "command": "test -f README.md || echo '⚠️  No README.md found in this project'"
+        },
+        {
+          "type": "command",
+          "command": "test -f .gitignore || echo '⚠️  No .gitignore found in this project'"
+        }
+      ]
+    }
+  ]
+}

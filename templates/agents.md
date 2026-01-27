@@ -21,6 +21,8 @@ This file provides guidance to AI coding assistants when working with this repos
 - Comments only when logic isn't self-evident
 - Prefer simple solutions over clever ones
 - Keep files focused and small
+- Use tabs for indentation
+- Use `pnpm` as package manager
 
 ## Conventions
 
@@ -29,6 +31,7 @@ This file provides guidance to AI coding assistants when working with this repos
 - Colocate components with their routes when feature-specific
 - Keep API routes thin - business logic in lib/
 - Use Supabase RLS for authorization
+- Commit format: `type: description` (feat, fix, refactor, docs, test, chore)
 
 ## Project Structure
 

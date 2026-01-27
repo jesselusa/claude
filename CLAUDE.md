@@ -35,6 +35,19 @@ jl-claude-assistant/
 - Comments only when logic isn't self-evident
 - Prefer simple solutions over clever ones
 - Keep files focused and small
+- Use tabs for indentation (not spaces)
+
+### Tooling
+- **Package manager**: `pnpm` (not npm/yarn)
+- **Pre-build**: Always run `lint` + `type-check` before builds
+- **Commit format**: `type: description` (e.g., `feat: add login`, `fix: timezone bug`)
+  - Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
+
+### Safety Rules
+- Never expose environment variables in code or logs
+- Never run `rm -rf` without explicit user confirmation
+- Never run destructive database commands (`DROP`, `TRUNCATE`, `db reset`)
+- Secrets only in `.env.local` (never committed)
 
 ### Design
 - Mobile-first responsive design - always optimize for phone use
