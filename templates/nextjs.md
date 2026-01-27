@@ -42,6 +42,7 @@ lib/
 
 ## Conventions
 
+- Mobile-first responsive design - always optimize for phone use
 - Use Server Components by default, Client Components only when needed
 - Colocate components with their routes when feature-specific
 - Keep API routes thin - business logic in lib/

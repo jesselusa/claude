@@ -36,6 +36,9 @@ jl-claude-assistant/
 - Prefer simple solutions over clever ones
 - Keep files focused and small
 
+### Design
+- Mobile-first responsive design - always optimize for phone use
+
 ## Development Workflow
 
 For non-trivial features, follow this structured process:
