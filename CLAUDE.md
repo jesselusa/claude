@@ -22,8 +22,15 @@ jl-claude-assistant/
 
 ## Personal Preferences
 
-<!-- Add your coding style preferences here -->
-<!-- Example: -->
-<!-- - Prefer TypeScript over JavaScript -->
-<!-- - Use functional components in React -->
-<!-- - Prefer named exports over default exports -->
+### Languages & Stack
+- **Primary**: TypeScript/JavaScript, Python
+- **Frontend**: Next.js (App Router) with React
+- **Styling**: Tailwind CSS
+- **Backend**: Supabase (Postgres, Auth, Realtime)
+- **Deployment**: Vercel
+
+### Code Style
+- Concise and minimal - avoid unnecessary boilerplate
+- Comments only when logic isn't self-evident
+- Prefer simple solutions over clever ones
+- Keep files focused and small
