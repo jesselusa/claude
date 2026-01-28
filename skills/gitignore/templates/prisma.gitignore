@@ -1,0 +1,6 @@
+# Prisma local databases
+prisma/*.db
+prisma/*.db-journal
+
+# Prisma generated
+prisma/generated/

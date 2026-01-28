@@ -1,0 +1,22 @@
+# Claude and AI tools
+.claude*
+CLAUDE.md
+.cursor*
+
+# User working files
+TODO*
+archive*
+
+# Environment files
+.env*
+!.env.example
+
+# Editor directories
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/

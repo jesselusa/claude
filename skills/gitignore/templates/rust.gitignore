@@ -1,0 +1,13 @@
+# Rust build artifacts
+/target/
+debug/
+release/
+
+# Cargo lock for libraries (keep for binaries)
+# Cargo.lock
+
+# Backup files
+**/*.rs.bk
+
+# MSVC Windows builds
+*.pdb

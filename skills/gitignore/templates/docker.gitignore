@@ -1,0 +1,7 @@
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Ignore local docker data volumes
+data/
+volumes/

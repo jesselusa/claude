@@ -1,0 +1,5 @@
+# Permissive robots.txt
+# Allow all crawlers including search engines and AI
+
+User-agent: *
+Allow: /

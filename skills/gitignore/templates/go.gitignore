@@ -1,0 +1,21 @@
+# Go binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Go build cache
+go.work
+go.work.sum
+
+# Output
+/bin/
+/vendor/
+
+# Coverage
+coverage.out
+coverage.html

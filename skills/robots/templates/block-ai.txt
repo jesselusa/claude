@@ -1,0 +1,258 @@
+# Block AI crawlers
+# Allow search engines (Googlebot, Bingbot, etc.)
+
+User-agent: *
+Allow: /
+
+# ===== AI COMPANIES =====
+
+# OpenAI
+User-agent: GPTBot
+Disallow: /
+User-agent: ChatGPT-User
+Disallow: /
+User-agent: OpenAI-SearchBot
+Disallow: /
+User-agent: ChatGPT
+Disallow: /
+User-agent: GPT-4
+Disallow: /
+User-agent: ChatGPT-Agent
+Disallow: /
+User-agent: OAI-SearchBot
+Disallow: /
+User-agent: OpenAI
+Disallow: /
+User-agent: Operator
+Disallow: /
+
+# Anthropic
+User-agent: ClaudeBot
+Disallow: /
+User-agent: anthropic-ai
+Disallow: /
+User-agent: Claude-Web
+Disallow: /
+User-agent: Claude
+Disallow: /
+User-agent: Claude-3
+Disallow: /
+User-agent: Claude-SearchBot
+Disallow: /
+User-agent: Claude-User
+Disallow: /
+
+# Google AI (NOT Googlebot search)
+User-agent: Google-Extended
+Disallow: /
+User-agent: GoogleOther
+Disallow: /
+User-agent: Bard
+Disallow: /
+User-agent: Bard-Bot
+Disallow: /
+User-agent: Gemini
+Disallow: /
+User-agent: Gemini-Deep-Research
+Disallow: /
+User-agent: Google-CloudVertexBot
+Disallow: /
+User-agent: Google-Firebase
+Disallow: /
+User-agent: Google-NotebookLM
+Disallow: /
+User-agent: GoogleAgent-Mariner
+Disallow: /
+User-agent: GoogleOther-Image
+Disallow: /
+User-agent: GoogleOther-Video
+Disallow: /
+User-agent: NotebookLM
+Disallow: /
+User-agent: CloudVertexBot
+Disallow: /
+
+# Meta / Facebook AI
+User-agent: FacebookBot
+Disallow: /
+User-agent: Meta-ExternalAgent
+Disallow: /
+User-agent: meta-externalfetcher
+Disallow: /
+User-agent: Meta-ExternalFetcher
+Disallow: /
+User-agent: meta-webindexer
+Disallow: /
+
+# ByteDance / TikTok
+User-agent: Bytespider
+Disallow: /
+User-agent: TikTokBot
+Disallow: /
+
+# Amazon
+User-agent: Amazonbot
+Disallow: /
+
+# Apple AI
+User-agent: Applebot
+Disallow: /
+User-agent: AppleBot-Extended
+Disallow: /
+
+# Cohere
+User-agent: cohere-ai
+Disallow: /
+User-agent: cohere-training-data-crawler
+Disallow: /
+
+# Perplexity AI
+User-agent: PerplexityBot
+Disallow: /
+User-agent: Perplexity-User
+Disallow: /
+
+# Character.AI
+User-agent: CharacterAI
+Disallow: /
+
+# Inflection AI (Pi)
+User-agent: InflectionBot
+Disallow: /
+
+# Stability AI
+User-agent: StabilityBot
+Disallow: /
+User-agent: StabilityAI
+Disallow: /
+
+# Hugging Face
+User-agent: HuggingFaceBot
+Disallow: /
+
+# Midjourney
+User-agent: MidjourneyBot
+Disallow: /
+
+# Runway
+User-agent: RunwayBot
+Disallow: /
+
+# Poe (Quora)
+User-agent: PoeBot
+Disallow: /
+
+# Replicate
+User-agent: ReplicateBot
+Disallow: /
+
+# You.com
+User-agent: YouBot
+Disallow: /
+User-agent: You-Snippets
+Disallow: /
+User-agent: YouBot-Image
+Disallow: /
+User-agent: YouBot-Video
+Disallow: /
+
+# Mistral AI
+User-agent: MistralAI-User
+Disallow: /
+User-agent: MistralAI-User/1.0
+Disallow: /
+
+# DeepSeek
+User-agent: DeepSeekBot
+Disallow: /
+
+# Brave AI
+User-agent: Bravebot
+Disallow: /
+
+# DuckDuckGo AI
+User-agent: DuckAssistBot
+Disallow: /
+
+# Phind
+User-agent: PhindBot
+Disallow: /
+
+# ===== AI AGENTS =====
+
+User-agent: Devin
+Disallow: /
+User-agent: NovaAct
+Disallow: /
+User-agent: Manus-User
+Disallow: /
+User-agent: TwinAgent
+Disallow: /
+
+# ===== DATA & TRAINING CRAWLERS =====
+
+User-agent: img2dataset
+Disallow: /
+User-agent: LAIONDownloader
+Disallow: /
+User-agent: laion-huggingface-processor
+Disallow: /
+User-agent: Crawl4AI
+Disallow: /
+User-agent: FirecrawlAgent
+Disallow: /
+User-agent: Diffbot
+Disallow: /
+User-agent: Scrapy
+Disallow: /
+User-agent: TavilyBot
+Disallow: /
+User-agent: Spider
+Disallow: /
+
+# ===== CHINESE AI =====
+
+User-agent: ChatGLM-Spider
+Disallow: /
+User-agent: PanguBot
+Disallow: /
+
+# ===== OTHER AI SERVICES =====
+
+User-agent: iAskBot
+Disallow: /
+User-agent: iaskspider
+Disallow: /
+User-agent: LinerBot
+Disallow: /
+User-agent: QuillBot
+Disallow: /
+User-agent: WRTNBot
+Disallow: /
+
+# Common Crawl (used for AI training)
+User-agent: CCBot
+Disallow: /
+
+# ===== GENERIC AI PATTERNS =====
+
+User-agent: LLaMA
+Disallow: /
+User-agent: Vicuna
+Disallow: /
+User-agent: Alpaca
+Disallow: /
+User-agent: ChatBot
+Disallow: /
+User-agent: AI-Bot
+Disallow: /
+User-agent: ML-Bot
+Disallow: /
+User-agent: TrainingBot
+Disallow: /
+User-agent: DataBot
+Disallow: /
+User-agent: ScrapingBot
+Disallow: /
+User-agent: ContentBot
+Disallow: /
