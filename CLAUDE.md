@@ -9,6 +9,7 @@ This is a personal Claude Code configuration repository containing:
 - MCP server configurations
 - Custom hooks
 - Project templates for CLAUDE.md files
+- Custom skills (slash commands)
 
 ## Structure
 
@@ -18,7 +19,8 @@ jl-claude-assistant/
 ├── mcp-servers/       # MCP server configurations
 ├── hooks/             # Custom automation hooks
 ├── templates/         # CLAUDE.md templates for different project types
-└── workflows/         # AI dev workflow templates (PRD → Tasks → Execute)
+├── workflows/         # AI dev workflow templates (PRD → Tasks → Execute)
+└── skills/            # Custom slash commands (/security-audit, etc.)
 ```
 
 ## Personal Preferences
