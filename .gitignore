@@ -9,3 +9,6 @@
 *.secret
 *.env
 credentials.json
+
+# Security audit
+.security-audit/
