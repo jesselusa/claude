@@ -1,43 +1,50 @@
 ---
 name: sync-starter
-description: Sync improvements from current project to starter template
-argument-hint: [--dry-run] [--gitignore] [--robots] [--claude] [--no-push]
+description: Sync generic learnings from project CLAUDE.md back to starter template
+argument-hint: [--dry-run] [--no-pr]
 disable-model-invocation: true
 ---
 
 # Sync to Starter Template
 
-Extract lessons learned from the current project and sync improvements back to the starter template repository.
+Extract generic, reusable guidance from the current project's CLAUDE.md and sync it back to the starter template repository. Confirms each item individually before syncing.
 
 **Argument:** $ARGUMENTS
 
-**Default behavior:** Compare current project against remote starter repo and show diffs for approval.
+**Default behavior:** Analyze project's CLAUDE.md for generic content, confirm each item with user, then create a PR with approved changes.
 
 **Modifiers:**
 - `--dry-run` or `-n`: Show what would change without modifying
-- `--gitignore`: Only sync .gitignore changes
-- `--robots`: Only sync robots.txt changes
-- `--claude`: Only sync CLAUDE.md Memory section changes
-- `--no-push`: Apply changes locally but don't push to remote
+- `--no-pr`: Apply changes locally but don't push or create PR
 
 ## Configuration
 
-- **Starter repo:** `dcnu/starter` (GitHub)
-- **Files to sync:** `.gitignore`, `robots.txt`, `CLAUDE.md`
-- **Cascade updates:** CLAUDE.md changes trigger README.md updates
-- **Local clone path:** `/tmp/starter-sync-$$` (temporary, cleaned up after)
+- **Starter repo:** `jesselusa/claude` (GitHub)
+- **Source file:** Project's `CLAUDE.md`
+- **Target file:** Starter's `CLAUDE.md`
 
-## Sync Flow
+## What Gets Synced
 
-The sync follows a cascading update pattern:
+Only sync content that is **generic and reusable across any project**:
 
-```
-Current Project → CLAUDE.md → README.md → Remote Repo
-```
+**SYNC (Generic):**
+- Workflow patterns (e.g., "Always run lint before commit")
+- Code style preferences (e.g., "Use tabs for indentation")
+- Tool preferences (e.g., "Use pnpm, not npm")
+- Safety rules (e.g., "Never expose env variables")
+- Design principles (e.g., "Mobile-first responsive design")
+- Commit conventions (e.g., "feat/fix/refactor format")
+- Testing approaches
+- General best practices
 
-1. **CLAUDE.md** is the source of truth for tech stack and standards
-2. **README.md** derives its tech stack section from CLAUDE.md
-3. Changes flow in one direction: CLAUDE.md → README.md → push to remote
+**DON'T SYNC (Project-Specific):**
+- Project name or description
+- Specific file paths or directory structures
+- Data models or database schemas
+- API endpoints or routes
+- Component names
+- Feature-specific instructions
+- Tech stack details unique to this project
 
 ## Execution Steps
 
@@ -45,74 +52,110 @@ Current Project → CLAUDE.md → README.md → Remote Repo
 
 Check current directory is not the starter repo itself:
 ```bash
-git remote get-url origin 2>/dev/null | grep -q "dcnu/starter"
+git remote get-url origin 2>/dev/null | grep -q "jesselusa/claude"
 ```
 
 If match found, abort: "Cannot sync starter to itself. Run this from a project directory."
 
-### 2. Collect Current Project Files
+### 2. Read Both CLAUDE.md Files
 
-Read the following files from current project (skip if missing):
-- `.gitignore`
-- `robots.txt`
-- `CLAUDE.md`
-
-### 3. Fetch Starter Template from Remote
-
-Fetch files directly from GitHub using `gh`:
+Read project's CLAUDE.md:
 ```bash
-gh api repos/dcnu/starter/contents/.gitignore --jq '.content' | base64 -d
-gh api repos/dcnu/starter/contents/robots.txt --jq '.content' | base64 -d
-gh api repos/dcnu/starter/contents/CLAUDE.md --jq '.content' | base64 -d
-gh api repos/dcnu/starter/contents/README.md --jq '.content' | base64 -d
+cat ./CLAUDE.md
 ```
 
-### 4. Analyze Differences
+Fetch starter's CLAUDE.md from GitHub:
+```bash
+gh api repos/jesselusa/claude/contents/CLAUDE.md --jq '.content' | base64 -d
+```
 
-For each file type, identify additions that could improve the starter:
+### 3. Extract Generic Content
 
-#### .gitignore Analysis
-- Extract all non-comment lines from both files
-- Identify patterns in current project not in starter
-- Filter out project-specific patterns
+Parse the project's CLAUDE.md and identify sections/bullet points that are:
+- Generic enough to apply to any project
+- Not already present in the starter's CLAUDE.md
+- Valuable as reusable guidance
 
-#### robots.txt Analysis
-- Extract User-agent blocks from both files
-- Identify new User-agents blocked in current project
+For each potential item, categorize it:
+- **Workflow**: How to work with the codebase
+- **Style**: Code formatting and conventions
+- **Safety**: Security and safety rules
+- **Tooling**: Tool preferences and commands
+- **Design**: UI/UX principles
+- **Testing**: Testing approaches
 
-#### CLAUDE.md Analysis
-- Focus on the "Memory" section (content after "# Memory" heading)
-- Extract bullet points from current project's Memory section
-- Identify entries not present in starter's Memory section
+### 4. Confirm Each Item Individually
 
-### 5. Present Differences for Approval
+For EACH generic item found, use AskUserQuestion to confirm:
 
-For each file with changes, display diff and use AskUserQuestion:
-- Options: "Yes, add all", "Let me select", "Skip this file"
+```
+Found potential sync item:
 
-### 6. Clone and Apply Changes
+Category: [Workflow/Style/Safety/etc.]
+Content: "[the actual content]"
 
-Clone the starter repo to a temp directory:
+Should this be synced to the starter template?
+```
+
+Options:
+- "Yes, sync this"
+- "No, skip this"
+- "Edit before syncing" (user provides modified version)
+
+Continue until all items are reviewed.
+
+### 5. Clone and Apply Changes
+
+If any items were approved:
+
 ```bash
 TEMP_DIR=$(mktemp -d)
-git clone --depth 1 https://github.com/dcnu/starter.git "$TEMP_DIR"
+git clone --depth 1 https://github.com/jesselusa/claude.git "$TEMP_DIR"
 cd "$TEMP_DIR"
 ```
 
-Apply approved changes to each file.
+Add approved items to the appropriate section in CLAUDE.md.
 
-### 7. Commit and Push
+### 6. Create Branch, Commit, Push, and Open PR
 
-Stage, commit, and push changes:
+Create branch with auto-generated name:
 ```bash
-git add .gitignore robots.txt CLAUDE.md README.md
-git commit -m "Update: Sync template improvements"
-git push origin main
+BRANCH_NAME="sync/$(basename "$OLDPWD")-$(date +%Y%m%d-%H%M%S)"
+git checkout -b "$BRANCH_NAME"
 ```
 
-### 8. Cleanup
+Commit changes:
+```bash
+git add CLAUDE.md
+git commit -m "$(cat <<'EOF'
+sync: learnings from [project-name]
 
-Remove temporary clone:
+Synced generic guidance from [project-name] to starter template.
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+EOF
+)"
+```
+
+Push and create PR:
+```bash
+git push -u origin "$BRANCH_NAME"
+gh pr create --title "sync: learnings from [project-name]" --body "$(cat <<'EOF'
+## Summary
+Synced generic, reusable guidance from [project-name].
+
+### Items synced
+- [list approved items]
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+EOF
+)"
+```
+
+The `gh pr create` command will output the PR URL.
+
+### 7. Cleanup
+
 ```bash
 rm -rf "$TEMP_DIR"
 ```
@@ -120,25 +163,26 @@ rm -rf "$TEMP_DIR"
 ## Output Format
 
 ```
-## Starter Template Sync - $CWD
+## Starter Template Sync - [project-name]
 
-Comparing against: github.com/dcnu/starter
+Comparing against: github.com/jesselusa/claude
 
-### .gitignore
-[X new patterns found]
-- pattern1 (category)
-- pattern2 (category)
+### Potential Items Found
 
-### robots.txt
-[X new user-agents found]
-- UserAgent1 (AI Company)
+1. [Category] "[content snippet]"
+   → User approved / skipped / edited
 
-### CLAUDE.md Memory
-[X new entries found]
-- Entry 1
-- Entry 2
+2. [Category] "[content snippet]"
+   → User approved / skipped / edited
 
----
+...
 
-Ready to sync? Approve changes to commit and push to remote.
+### Summary
+- X items approved
+- Y items skipped
+- Z items edited
+
+[If approved items exist]
+Branch: sync/[project-name]-[timestamp]
+PR: [URL from gh pr create]
 ```
