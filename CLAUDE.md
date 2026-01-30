@@ -119,6 +119,7 @@ Dedicate ~20% of time to AI-driven refactoring. Good for low-focus days:
 - Prefer simple solutions over clever ones
 - Keep files focused and small
 - Use tabs for indentation (not spaces)
+- Always use existing components first - check `components/ui/` before creating new UI elements
 
 ### Tooling
 - **Package manager**: `pnpm` (not npm/yarn)
@@ -150,6 +151,11 @@ Follow this structured process:
 3. **Execute** - Work through tasks incrementally, checking off as completed
 
 Reserve detailed planning for genuinely ambiguous architectural decisions.
+
+### Task Tracking
+- Check `tasks/` directory for task files to see outstanding work before starting
+- Update task files after commits - mark completed tasks with `[x]`, add new tasks as needed
+- Update documentation files (CLAUDE.md, README.md) when changing: data model, project structure, tech stack, design patterns, or key features
 
 ---
 
