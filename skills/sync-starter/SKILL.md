@@ -1,31 +1,36 @@
 ---
 name: sync-starter
-description: Sync generic learnings from project CLAUDE.md and agents.md back to starter template
-argument-hint: [--dry-run] [--no-pr]
+description: Sync generic learnings from project files back to starter template
+argument-hint: [--dry-run] [--no-pr] [--claude] [--agents] [--gitignore] [--robots]
 disable-model-invocation: true
 ---
 
 # Sync to Starter Template
 
-Extract generic, reusable guidance from the current project's `CLAUDE.md` and `agents.md` and sync it back to the starter template repository. Confirms each item individually before syncing.
+Extract generic, reusable content from the current project and sync it back to the starter template repository. Confirms each item individually before syncing.
 
 **Argument:** $ARGUMENTS
 
-**Default behavior:** Analyze project's CLAUDE.md and agents.md for generic content, confirm each item with user, then create a PR with approved changes.
+**Default behavior:** Analyze all syncable files for generic content, confirm each item with user, then create a PR with approved changes.
 
 **Modifiers:**
 - `--dry-run` or `-n`: Show what would change without modifying
 - `--no-pr`: Apply changes locally but don't push or create PR
+- `--claude`: Only sync CLAUDE.md
+- `--agents`: Only sync agents.md
+- `--gitignore`: Only sync .gitignore
+- `--robots`: Only sync robots.txt
 
 ## Configuration
 
 - **Starter repo:** `jesselusa/claude` (GitHub)
-- **Source files:** Project's `CLAUDE.md` and `agents.md`
-- **Target files:** Starter's `CLAUDE.md` and `agents.md`
+- **Files to sync:** `CLAUDE.md`, `agents.md`, `.gitignore`, `robots.txt`
 
 ## What Gets Synced
 
-Only sync content that is **generic and reusable across any project**:
+Only sync content that is **generic and reusable across any project**.
+
+### CLAUDE.md & agents.md
 
 **SYNC (Generic):**
 - Workflow patterns (e.g., "Always run lint before commit")
@@ -46,6 +51,28 @@ Only sync content that is **generic and reusable across any project**:
 - Feature-specific instructions
 - Tech stack details unique to this project
 
+### .gitignore
+
+**SYNC:**
+- Common patterns for the detected tech stack (Node, Python, etc.)
+- IDE/editor files (.vscode, .idea)
+- OS files (.DS_Store, Thumbs.db)
+- Generic build artifacts
+
+**DON'T SYNC:**
+- Project-specific paths
+- Custom local-only patterns
+
+### robots.txt
+
+**SYNC:**
+- AI bot blocking rules (GPTBot, CCBot, etc.)
+- Common crawler rules
+
+**DON'T SYNC:**
+- Site-specific paths
+- Custom allow/disallow rules
+
 ## Execution Steps
 
 ### 1. Validate Environment
@@ -59,32 +86,46 @@ If match found, abort: "Cannot sync starter to itself. Run this from a project d
 
 ### 2. Read Source and Target Files
 
+Determine which files to sync based on modifiers (default: all).
+
 Read project files (skip if missing):
 ```bash
 cat ./CLAUDE.md
 cat ./agents.md
+cat ./.gitignore
+cat ./robots.txt
 ```
 
 Fetch starter files from GitHub:
 ```bash
 gh api repos/jesselusa/claude/contents/CLAUDE.md --jq '.content' | base64 -d
 gh api repos/jesselusa/claude/contents/agents.md --jq '.content' | base64 -d
+gh api repos/jesselusa/claude/contents/.gitignore --jq '.content' | base64 -d
+gh api repos/jesselusa/claude/contents/robots.txt --jq '.content' | base64 -d
 ```
 
 ### 3. Extract Generic Content
 
-Parse the project's CLAUDE.md and identify sections/bullet points that are:
+For each file type, identify content that is:
 - Generic enough to apply to any project
-- Not already present in the starter's CLAUDE.md
+- Not already present in the starter
 - Valuable as reusable guidance
 
-For each potential item, categorize it:
+**For CLAUDE.md/agents.md**, categorize items:
 - **Workflow**: How to work with the codebase
 - **Style**: Code formatting and conventions
 - **Safety**: Security and safety rules
 - **Tooling**: Tool preferences and commands
 - **Design**: UI/UX principles
 - **Testing**: Testing approaches
+
+**For .gitignore**, identify:
+- New patterns not in starter
+- Patterns that are generic (not project-specific paths)
+
+**For robots.txt**, identify:
+- New User-agent blocks
+- New Disallow rules that are generic
 
 ### 4. Confirm Each Item Individually
 
@@ -116,7 +157,7 @@ git clone --depth 1 https://github.com/jesselusa/claude.git "$TEMP_DIR"
 cd "$TEMP_DIR"
 ```
 
-Add approved items to the appropriate section in CLAUDE.md and/or agents.md.
+Add approved items to the appropriate files (CLAUDE.md, agents.md, .gitignore, and/or robots.txt).
 
 ### 6. Create Branch, Commit, Push, and Open PR
 
@@ -126,13 +167,13 @@ BRANCH_NAME="sync/$(basename "$OLDPWD")-$(date +%Y%m%d-%H%M%S)"
 git checkout -b "$BRANCH_NAME"
 ```
 
-Commit changes:
+Commit changes (only add files that were modified):
 ```bash
-git add CLAUDE.md agents.md
+git add CLAUDE.md agents.md .gitignore robots.txt 2>/dev/null
 git commit -m "$(cat <<'EOF'
 sync: learnings from [project-name]
 
-Synced generic guidance from [project-name] to starter template.
+Synced generic content from [project-name] to starter template.
 
 Co-Authored-By: Claude <noreply@anthropic.com>
 EOF
