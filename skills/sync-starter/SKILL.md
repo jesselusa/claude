@@ -1,17 +1,17 @@
 ---
 name: sync-starter
-description: Sync generic learnings from project CLAUDE.md back to starter template
+description: Sync generic learnings from project CLAUDE.md and agents.md back to starter template
 argument-hint: [--dry-run] [--no-pr]
 disable-model-invocation: true
 ---
 
 # Sync to Starter Template
 
-Extract generic, reusable guidance from the current project's CLAUDE.md and sync it back to the starter template repository. Confirms each item individually before syncing.
+Extract generic, reusable guidance from the current project's `CLAUDE.md` and `agents.md` and sync it back to the starter template repository. Confirms each item individually before syncing.
 
 **Argument:** $ARGUMENTS
 
-**Default behavior:** Analyze project's CLAUDE.md for generic content, confirm each item with user, then create a PR with approved changes.
+**Default behavior:** Analyze project's CLAUDE.md and agents.md for generic content, confirm each item with user, then create a PR with approved changes.
 
 **Modifiers:**
 - `--dry-run` or `-n`: Show what would change without modifying
@@ -20,8 +20,8 @@ Extract generic, reusable guidance from the current project's CLAUDE.md and sync
 ## Configuration
 
 - **Starter repo:** `jesselusa/claude` (GitHub)
-- **Source file:** Project's `CLAUDE.md`
-- **Target file:** Starter's `CLAUDE.md`
+- **Source files:** Project's `CLAUDE.md` and `agents.md`
+- **Target files:** Starter's `CLAUDE.md` and `agents.md`
 
 ## What Gets Synced
 
@@ -57,16 +57,18 @@ git remote get-url origin 2>/dev/null | grep -q "jesselusa/claude"
 
 If match found, abort: "Cannot sync starter to itself. Run this from a project directory."
 
-### 2. Read Both CLAUDE.md Files
+### 2. Read Source and Target Files
 
-Read project's CLAUDE.md:
+Read project files (skip if missing):
 ```bash
 cat ./CLAUDE.md
+cat ./agents.md
 ```
 
-Fetch starter's CLAUDE.md from GitHub:
+Fetch starter files from GitHub:
 ```bash
 gh api repos/jesselusa/claude/contents/CLAUDE.md --jq '.content' | base64 -d
+gh api repos/jesselusa/claude/contents/agents.md --jq '.content' | base64 -d
 ```
 
 ### 3. Extract Generic Content
@@ -114,7 +116,7 @@ git clone --depth 1 https://github.com/jesselusa/claude.git "$TEMP_DIR"
 cd "$TEMP_DIR"
 ```
 
-Add approved items to the appropriate section in CLAUDE.md.
+Add approved items to the appropriate section in CLAUDE.md and/or agents.md.
 
 ### 6. Create Branch, Commit, Push, and Open PR
 
@@ -126,7 +128,7 @@ git checkout -b "$BRANCH_NAME"
 
 Commit changes:
 ```bash
-git add CLAUDE.md
+git add CLAUDE.md agents.md
 git commit -m "$(cat <<'EOF'
 sync: learnings from [project-name]
 
