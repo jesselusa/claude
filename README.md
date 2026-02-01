@@ -37,6 +37,7 @@ Custom slash commands available after installation:
 | `/techdebt` | End-of-session cleanup (dead code, duplicates, TODOs) |
 | `/claude-cleanup` | Scan and redact secrets from Claude memory |
 | `/cleanup` | Rename files to `Source-Title-date.ext` convention |
+| `/create-new-project` | Scaffold new project with templates, optional PRD, optional GitHub repo |
 | `/create-readme` | Generate README.md and LICENSE |
 | `/gitignore` | Generate .gitignore by project type |
 | `/kill-ports` | Find and kill processes on TCP ports |

@@ -14,14 +14,48 @@ This is a personal Claude Code configuration repository containing:
 ## Structure
 
 ```
-jl-claude-assistant/
+claude/
 ├── CLAUDE.md          # This file - global preferences
-├── mcp-servers/       # MCP server configurations
-├── hooks/             # Custom automation hooks
-├── templates/         # CLAUDE.md templates for different project types
-├── workflows/         # AI dev workflow templates (PRD → Tasks → Execute)
-└── skills/            # Custom slash commands (/security-audit, etc.)
+├── skills/            # Custom slash commands (see below)
+├── hooks/             # Automation hooks (lint, build checks)
+├── templates/         # CLAUDE.md templates for new projects
+├── workflows/         # PRD → Tasks workflow templates
+└── mcp-servers/       # MCP server configurations
 ```
+
+## Development Commands
+
+```bash
+# Install skills globally (symlink for easy updates)
+mkdir -p ~/.claude/skills
+for skill in ~/Documents/GitHub/claude/skills/*/; do
+    ln -sf "$skill" ~/.claude/skills/
+done
+
+# Test a skill locally
+cd ~/.claude/skills && ls -la  # verify symlinks
+
+# Copy a hook to a project
+cp hooks/nextjs-hooks.json /path/to/project/.claude/hooks.json
+
+# Copy a template to a new project
+cp templates/nextjs.md /path/to/project/CLAUDE.md
+```
+
+## Available Skills
+
+| Command | Description |
+|---------|-------------|
+| `/security-audit` | 7-phase security audit (deps, secrets, logs) |
+| `/techdebt` | End-of-session cleanup (dead code, duplicates, TODOs) |
+| `/claude-cleanup` | Scan and redact secrets from Claude memory |
+| `/cleanup` | Rename files to `Source-Title-date.ext` convention |
+| `/create-new-project` | Scaffold new project with templates, optional PRD & GitHub |
+| `/create-readme` | Generate README.md and LICENSE |
+| `/gitignore` | Generate .gitignore by project type |
+| `/kill-ports` | Find and kill processes on TCP ports |
+| `/robots` | Generate robots.txt with AI/SEO blocking |
+| `/sync-starter` | Sync improvements back to this starter template |
 
 ---
 
@@ -111,15 +145,19 @@ Before wrapping up:
 
 ---
 
-## Skills & Commands
+## Creating New Skills
 
-If you do something more than once a day, turn it into a skill or command.
+If you do something more than once a day, turn it into a skill.
 
-**Where skills live:** `skills/<name>/SKILL.md` - no symlinks needed, Claude Code finds them automatically.
+**Location:** `skills/<name>/SKILL.md` - Claude Code finds them automatically after symlinking to `~/.claude/skills/`
 
-Ideas:
-- Context dump command - sync Slack, docs, issues into one context
-- Analytics queries - reusable BigQuery/Supabase skills
+**Structure:**
+```
+skill-name/
+├── SKILL.md          # Required: skill definition
+├── *.sh              # Optional: supporting scripts
+└── templates/        # Optional: template files
+```
 
 ---
 

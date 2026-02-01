@@ -9,6 +9,7 @@ Custom skills (slash commands) for Claude Code. Based on [dcnu/claude](https://g
 | Security Audit | `/security-audit` | Comprehensive 7-phase security audit (deps, secrets, logs) |
 | Claude Cleanup | `/claude-cleanup` | Scan and redact secrets from Claude memory files |
 | Cleanup | `/cleanup` | Rename files to `Source-Title-date.ext` convention |
+| Create New Project | `/create-new-project` | Scaffold new project with templates, optional PRD & GitHub |
 | Create README | `/create-readme` | Generate README.md and LICENSE for projects |
 | Gitignore | `/gitignore` | Generate .gitignore based on detected project type |
 | Kill Ports | `/kill-ports` | Find and kill processes listening on TCP ports |
@@ -39,11 +40,13 @@ ln -sf ~/Documents/GitHub/jl-claude-assistant/skills/gitignore ~/.claude/skills/
 Once installed, invoke skills with `/` prefix:
 
 ```
-/security-audit           # Run full security audit
-/gitignore                # Generate .gitignore
-/cleanup ~/Downloads      # Rename files in Downloads
-/robots                   # Generate robots.txt
-/kill-ports               # Kill processes on ports
+/security-audit                    # Run full security audit
+/gitignore                         # Generate .gitignore
+/cleanup ~/Downloads               # Rename files in Downloads
+/robots                            # Generate robots.txt
+/kill-ports                        # Kill processes on ports
+/create-new-project my-app         # Scaffold a new project
+/create-new-project my-api --python # Scaffold with Python template
 ```
 
 ## Creating New Skills
