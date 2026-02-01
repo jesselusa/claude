@@ -12,3 +12,9 @@ credentials.json
 
 # Security audit
 .security-audit/
+
+# Runtime logs
+logs/
+
+# Local settings (not shared)
+.claude/settings.local.json

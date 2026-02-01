@@ -34,6 +34,7 @@ Custom slash commands available after installation:
 | Command | Description |
 |---------|-------------|
 | `/security-audit` | 7-phase security audit (deps, secrets, logs) |
+| `/techdebt` | End-of-session cleanup (dead code, duplicates, TODOs) |
 | `/claude-cleanup` | Scan and redact secrets from Claude memory |
 | `/cleanup` | Rename files to `Source-Title-date.ext` convention |
 | `/create-readme` | Generate README.md and LICENSE |
