@@ -18,3 +18,9 @@ logs/
 
 # Local settings (not shared)
 .claude/settings.local.json
+
+# MCP tools
+.playwright-mcp
+
+# Supabase local
+/supabase

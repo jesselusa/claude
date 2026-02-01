@@ -164,6 +164,7 @@ Dedicate ~20% of time to AI-driven refactoring. Good for low-focus days:
 - **Pre-build**: Always run `lint` + `type-check` before builds
 - **Commit format**: `type: description` (e.g., `feat: add login`, `fix: timezone bug`)
   - Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
+- **Interactive prompts**: Use `AskUserQuestion` tool for lists, yes/no confirmations, and multi-choice decisions - provides a clean numbered UI that's faster than typing
 
 ### Safety Rules
 - Never expose environment variables in code or logs
