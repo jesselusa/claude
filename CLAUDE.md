@@ -32,6 +32,7 @@ jl-claude-assistant/
 - Don't over-specify - let the agent figure out implementation details
 - Under-prompt intentionally to discover unexpected solutions
 - Trust the agent to read the codebase and follow existing patterns
+- **Use voice dictation** (fn x2 on macOS) - you speak 3x faster than you type
 
 ### Screenshots > Descriptions
 - For UI work, paste a screenshot of what you want (or a bug you see)
@@ -48,14 +49,21 @@ jl-claude-assistant/
 - Queue messages instead of crafting "perfect" continuation prompts
 - Momentum matters more than polish
 
+### Power Prompts
+- "Grill me on these changes and don't make a PR until I pass your test"
+- "Prove to me this works" - have Claude diff behavior between main and feature branch
+- "Knowing everything you know now, scrap this and implement the elegant solution"
+- "Use subagents" - appending this throws more compute at the problem
+
 ---
 
 ## Multi-Agent Workflow
 
 ### Running Multiple Agents
-- Open 2-4 Claude Code terminals working in parallel
-- Give each agent a distinct feature or area to avoid conflicts
-- All agents can work in the same folder - use atomic commits to stay clean
+- **Use git worktrees** - spin up 3-5 worktrees, each with its own Claude session (biggest productivity unlock)
+- Set up shell aliases (za, zb, zc) to hop between worktrees in one keystroke
+- Also run sessions on claude.ai web - use `&` to hand off, `--teleport` to switch back
+- Keep a dedicated "analysis" worktree for reading logs and running queries
 
 ### When to Parallelize
 - Independent features that don't touch the same files
@@ -76,10 +84,42 @@ jl-claude-assistant/
 - Request tests immediately after each feature, in the same context
 - This catches bugs while the agent has full context of what was built
 
-### Self-Verification
-- Agents should run their own tests, lint, and type-check
-- Close the loop: agents verify their work before declaring done
-- Don't wait for CI - run tests locally through agents
+### Self-Verification (Critical)
+**Give Claude a way to verify its work - this 2-3x's quality.**
+
+- Run tests, lint, type-check after every change
+- For UI: test in browser, check mobile, verify no console errors
+- Close the loop before declaring done
+- If verification fails: fix → re-verify → repeat until green
+
+### Bug Fixing
+- Paste a Slack bug thread and just say "fix"
+- "Go fix the failing CI tests" - don't micromanage how
+- Point Claude at logs (docker, Vercel, Supabase) to troubleshoot
+
+---
+
+## End of Session Checklist
+
+Before wrapping up:
+
+1. **Verify** - run tests, lint, type-check pass
+2. **Clean** - run `/techdebt` to remove dead code, duplicates, debug statements
+3. **Update tasks** - mark completed `[x]`, add new tasks discovered
+4. **Update docs** - if you changed: data model, structure, stack, patterns, or features
+5. **Teach Claude** - if Claude made a mistake, say "Update CLAUDE.md so you don't make that mistake again"
+
+---
+
+## Skills & Commands
+
+If you do something more than once a day, turn it into a skill or command.
+
+**Where skills live:** `skills/<name>/SKILL.md` - no symlinks needed, Claude Code finds them automatically.
+
+Ideas:
+- Context dump command - sync Slack, docs, issues into one context
+- Analytics queries - reusable BigQuery/Supabase skills
 
 ---
 
@@ -87,8 +127,6 @@ jl-claude-assistant/
 
 Dedicate ~20% of time to AI-driven refactoring. Good for low-focus days:
 
-- "Find and remove dead code"
-- "Look for duplicated logic and consolidate"
 - "Update dependencies and fix any breaking changes"
 - "Improve test coverage for [module]"
 - "Find inconsistent patterns and standardize"
@@ -97,7 +135,7 @@ Dedicate ~20% of time to AI-driven refactoring. Good for low-focus days:
 
 ## This File is Living
 
-- Let agents update this CLAUDE.md with new patterns discovered during work
+- Claude is eerily good at writing rules for itself - let it
 - Periodically audit for redundancy and outdated guidance
 - Keep instructions concise - verbose guidance wastes tokens
 - Remove guidance that newer models handle automatically
@@ -133,8 +171,46 @@ Dedicate ~20% of time to AI-driven refactoring. Good for low-focus days:
 - Never run destructive database commands (`DROP`, `TRUNCATE`, `db reset`)
 - Secrets only in `.env.local` (never committed)
 
+### Security (Non-Negotiable)
+- **RLS on day one** - enable Row Level Security on all Supabase tables, test manually
+- **Rate limiting** - start strict (100 req/hr/IP), loosen later
+- **Sanitize inputs** - validate on backend, assume every input is malicious
+- **CAPTCHA** - on registration, login, contact forms, password reset (invisible mode)
+- **Review AI code** - don't blindly trust; let another AI or human review before merging
+
 ### Design
 - Mobile-first responsive design - always optimize for phone use
+
+---
+
+## Frontend Design
+
+Avoid generic "AI slop" aesthetics. Make distinctive frontends that surprise and delight.
+
+### Typography
+- Choose beautiful, unique fonts - avoid Inter, Roboto, Arial, system fonts
+- Distinctive choices elevate the whole design
+
+### Color & Theme
+- Commit to a cohesive aesthetic, use CSS variables
+- Dominant colors with sharp accents > timid, evenly-distributed palettes
+- Draw from IDE themes and cultural aesthetics for inspiration
+- Vary between light/dark themes - don't default to the same thing every time
+
+### Motion
+- Use animations for effects and micro-interactions
+- Prioritize CSS-only solutions for HTML, Motion library for React
+- One well-orchestrated page load with staggered reveals > scattered micro-interactions
+
+### Backgrounds
+- Create atmosphere and depth, not solid colors
+- Layer CSS gradients, geometric patterns, contextual effects
+
+### Avoid
+- Overused fonts (Inter, Roboto, Space Grotesk, Arial)
+- Clichéd color schemes (purple gradients on white)
+- Predictable layouts and cookie-cutter patterns
+- Safe, generic choices - think outside the box
 
 ---
 
@@ -152,10 +228,31 @@ Follow this structured process:
 
 Reserve detailed planning for genuinely ambiguous architectural decisions.
 
+### Plan Mode Rules
+**Start most sessions in Plan mode (shift+tab twice).** Iterate on the plan until it's solid, then switch to auto-accept and Claude can usually 1-shot it.
+
+- **Extreme concision** - sacrifice grammar for brevity. No fluff, no filler.
+- **End with unresolved questions** - list anything blocking or unclear
+- **Scannable format** - bullet points over paragraphs
+- **When things go sideways** - stop pushing, switch back to plan mode, re-plan
+- **Staff engineer review** - have a second Claude review the plan before implementing
+
+The loop: **Plan → Implement → Test → Verify → Commit → Repeat**
+
 ### Task Tracking
 - Check `tasks/` directory for task files to see outstanding work before starting
-- Update task files after commits - mark completed tasks with `[x]`, add new tasks as needed
-- Update documentation files (CLAUDE.md, README.md) when changing: data model, project structure, tech stack, design patterns, or key features
+
+---
+
+## Permissions
+
+Use `/permissions` to pre-allow common safe commands and avoid approval prompts:
+- git commands (status, diff, log, add, commit, push)
+- pnpm/npm commands (install, run, test, build)
+- gh CLI (pr, issue)
+- Basic tools (ls, pwd, curl, jq)
+
+Check `.claude/settings.json` for current allowlist.
 
 ---
 
