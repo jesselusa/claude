@@ -279,6 +279,13 @@ Reserve detailed planning for genuinely ambiguous architectural decisions.
 
 The loop: **Plan → Implement → Test → Verify → Commit → Repeat**
 
+### Branch Cleanup After PRs
+After merging PRs:
+1. GitHub auto-deletes remote branches on merge (if enabled in repo settings)
+2. Run `git fetch --prune` to remove stale remote refs locally
+3. Switch to main: `git checkout main && git pull`
+4. Delete local feature branch: `git branch -d <branch-name>`
+
 ### Task Tracking
 - Check `tasks/` directory for task files to see outstanding work before starting
 
