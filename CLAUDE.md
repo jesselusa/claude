@@ -252,13 +252,6 @@ Avoid generic "AI slop" aesthetics. Make distinctive frontends that surprise and
 - Predictable layouts and cookie-cutter patterns
 - Safe, generic choices - think outside the box
 
-### Social Sharing & Metadata (Next.js)
-- **`opengraph-image.tsx`** - Dynamic 1200x630 PNG for WhatsApp, Twitter, iMessage share previews. SVG won't work - must be raster.
-- **`icon.tsx`** and **`apple-icon.tsx`** - Dynamic favicons with rounded corners (20% radius). Avoids separate image files.
-- **`layout.tsx` metadata** - Include `openGraph` and `twitter` objects for full social metadata.
-- Test by visiting `/opengraph-image`, `/icon`, `/apple-icon` directly in dev.
-- WhatsApp aggressively caches - use Facebook's debug tool to clear: https://developers.facebook.com/tools/debug/
-
 ---
 
 ## Development Workflow
