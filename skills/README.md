@@ -25,13 +25,13 @@ Skills must be installed to `~/.claude/skills/` to be available globally:
 mkdir -p ~/.claude/skills
 
 # Symlink all skills (recommended for easy updates)
-for skill in ~/Documents/GitHub/jl-claude-assistant/skills/*/; do
+for skill in ~/Documents/GitHub/claude/skills/*/; do
     ln -sf "$skill" ~/.claude/skills/
 done
 
 # Or symlink individually
-ln -sf ~/Documents/GitHub/jl-claude-assistant/skills/security-audit ~/.claude/skills/
-ln -sf ~/Documents/GitHub/jl-claude-assistant/skills/gitignore ~/.claude/skills/
+ln -sf ~/Documents/GitHub/claude/skills/security-audit ~/.claude/skills/
+ln -sf ~/Documents/GitHub/claude/skills/gitignore ~/.claude/skills/
 # ... etc
 ```
 

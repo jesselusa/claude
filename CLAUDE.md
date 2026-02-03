@@ -1,6 +1,8 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file contains instructions Claude follows. Every section should pass the test: "Can Claude act on this?"
+
+User-facing tips (how to prompt, workflow advice, productivity tips) belong in README.md, not here.
 
 ## Repository Purpose
 
@@ -59,99 +61,61 @@ cp templates/nextjs.md /path/to/project/CLAUDE.md
 
 ---
 
-## Workflow Philosophy
+## Before You Work
 
-### Just Talk To It
-- Keep prompts short: 1-2 sentences is often enough
-- Don't over-specify - let the agent figure out implementation details
-- Under-prompt intentionally to discover unexpected solutions
-- Trust the agent to read the codebase and follow existing patterns
-- **Use voice dictation** (fn x2 on macOS) - you speak 3x faster than you type
-
-### Screenshots > Descriptions
-- For UI work, paste a screenshot of what you want (or a bug you see)
-- Visual references are faster and more precise than written descriptions
-- Use screenshots for ~50% of UI-related prompts
-
-### Trust Git, Not Approval Prompts
-- Rely on git history and `git checkout .` rather than approving every action
-- Nothing catastrophic happens if you have version control
-- Speed > excessive caution for local development
-
-### Queue, Don't Wait
-- While an agent is working, type your next instruction
-- Queue messages instead of crafting "perfect" continuation prompts
-- Momentum matters more than polish
-
-### Power Prompts
-- "Grill me on these changes and don't make a PR until I pass your test"
-- "Prove to me this works" - have Claude diff behavior between main and feature branch
-- "Knowing everything you know now, scrap this and implement the elegant solution"
-- "Use subagents" - appending this throws more compute at the problem
+At the start of every session:
+1. Run `git pull` to ensure you have the latest code
+2. Check `tasks/` directory for outstanding work
 
 ---
 
-## Multi-Agent Workflow
+## Working Style
 
-### Running Multiple Agents
-- **Use git worktrees** - spin up 3-5 worktrees, each with its own Claude session (biggest productivity unlock)
-- Set up shell aliases (za, zb, zc) to hop between worktrees in one keystroke
-- Also run sessions on claude.ai web - use `&` to hand off, `--teleport` to switch back
-- Keep a dedicated "analysis" worktree for reading logs and running queries
+### Act Confidently
+Make changes without excessive confirmation. Git provides safety - work can always be reverted with `git checkout .`
 
-### When to Parallelize
-- Independent features that don't touch the same files
-- Frontend + backend work simultaneously
-- Tests + implementation in parallel contexts
+### Parallel Work
+When tasks are independent (don't touch same files), use parallel agents:
+- Frontend + backend simultaneously
+- Tests + implementation in separate contexts
 
-### Keeping Context Clean
-- Each agent should focus on one concern
-- Don't overload a single context with unrelated tasks
-- Start fresh contexts for experimental/exploratory work
+### Stay Focused
+Focus on one concern per task. If asked about unrelated work, suggest starting a fresh context.
 
 ---
 
 ## Testing Approach
 
-### Test After, Not Before
-- Skip TDD - write tests *after* implementation
-- Request tests immediately after each feature, in the same context
-- This catches bugs while the agent has full context of what was built
+### Write Tests After Implementation
+Don't use TDD. Implement first, then write tests immediately after in the same context while you have full understanding of what was built.
 
 ### Self-Verification (Critical)
-**Give Claude a way to verify its work - this 2-3x's quality.**
-
-- Run tests, lint, type-check after every change
-- For UI: test in browser, check mobile, verify no console errors
-- Close the loop before declaring done
+After every change:
+- Run tests, lint, type-check
+- For UI: verify in browser, check mobile, confirm no console errors
+- Don't declare done until verification passes
 - If verification fails: fix → re-verify → repeat until green
-
-### Bug Fixing
-- Paste a Slack bug thread and just say "fix"
-- "Go fix the failing CI tests" - don't micromanage how
-- Point Claude at logs (docker, Vercel, Supabase) to troubleshoot
 
 ---
 
-## End of Session Checklist
+## Before Committing
 
-Before wrapping up:
-
-1. **Verify** - run tests, lint, type-check pass
-2. **Clean** - run `/techdebt` to remove dead code, duplicates, debug statements
-3. **Update tasks** - mark completed `[x]`, add new tasks discovered
-4. **Update docs** - if you changed: data model, structure, stack, patterns, or features
-5. **Teach Claude** - if Claude made a mistake, say "Update CLAUDE.md so you don't make that mistake again"
+1. **Clean** - run `/techdebt` to remove dead code, debug statements, duplicates
+2. **Verify** - tests, lint, type-check pass
+3. **Update tasks** - mark completed `[x]` in `tasks/`, add new tasks discovered
+4. **Update docs** if you changed:
+   - Data model → update schema docs or comments
+   - API/structure → update README
+   - Patterns/preferences → update CLAUDE.md
+5. **Teach Claude** - review the session for lessons learned (mistakes, improvements, patterns). Ask the user if they want them added to CLAUDE.md
+6. **Commit to feature branch** - always commit to a feature branch, then create a PR to merge
 
 ---
 
 ## Creating New Skills
 
-If you do something more than once a day, turn it into a skill.
+When creating skills, use this structure:
 
-**Location:** `skills/<name>/SKILL.md` - Claude Code finds them automatically after symlinking to `~/.claude/skills/`
-
-**Structure:**
 ```
 skill-name/
 ├── SKILL.md          # Required: skill definition
@@ -159,24 +123,18 @@ skill-name/
 └── templates/        # Optional: template files
 ```
 
----
-
-## Refactoring Time
-
-Dedicate ~20% of time to AI-driven refactoring. Good for low-focus days:
-
-- "Update dependencies and fix any breaking changes"
-- "Improve test coverage for [module]"
-- "Find inconsistent patterns and standardize"
+**Location:** `skills/<name>/SKILL.md` - Claude Code finds them automatically after symlinking to `~/.claude/skills/`
 
 ---
 
-## This File is Living
+## Updating This File
 
-- Claude is eerily good at writing rules for itself - let it
-- Periodically audit for redundancy and outdated guidance
-- Keep instructions concise - verbose guidance wastes tokens
-- Remove guidance that newer models handle automatically
+You have permission to suggest updates to CLAUDE.md when:
+- You make a mistake that could be prevented by a rule
+- You discover a pattern that should be codified
+- Existing guidance is outdated or redundant
+
+Keep instructions concise - verbose guidance wastes tokens.
 
 ---
 
@@ -203,7 +161,7 @@ Dedicate ~20% of time to AI-driven refactoring. Good for low-focus days:
 - **Commit format**: `type: description` (e.g., `feat: add login`, `fix: timezone bug`)
   - Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
 - **PR creation**: Always use `--assignee @me` when creating PRs with `gh pr create`
-- **Interactive prompts**: Use `AskUserQuestion` tool for lists, yes/no confirmations, and multi-choice decisions - provides a clean numbered UI that's faster than typing
+- **Asking questions**: Always use `AskUserQuestion` tool when asking questions - provides a clean UI for selections, confirmations, and multi-choice decisions
 
 ### Safety Rules
 - Never expose environment variables in code or logs
@@ -253,48 +211,48 @@ Avoid generic "AI slop" aesthetics. Make distinctive frontends that surprise and
 - Safe, generic choices - think outside the box
 
 ### Social Sharing & Metadata (Next.js)
-- **`opengraph-image.tsx`** - Dynamic 1200x630 PNG for WhatsApp, Twitter, iMessage share previews. SVG won't work - must be raster.
-- **`icon.tsx`** and **`apple-icon.tsx`** - Dynamic favicons with rounded corners (20% radius). Avoids separate image files.
-- **`layout.tsx` metadata** - Include `openGraph` and `twitter` objects for full social metadata.
-- Test by visiting `/opengraph-image`, `/icon`, `/apple-icon` directly in dev.
-- WhatsApp aggressively caches - use Facebook's debug tool to clear: https://developers.facebook.com/tools/debug/
+
+When building Next.js apps, always implement proper social sharing:
+
+1. **Create `opengraph-image.tsx`** - Dynamic 1200x630 PNG for share previews (WhatsApp, Twitter, iMessage). SVG won't work - must be raster.
+2. **Create `icon.tsx` and `apple-icon.tsx`** - Dynamic favicons with rounded corners (20% radius). Avoids separate image files.
+3. **Add metadata to `layout.tsx`** - Include `openGraph` and `twitter` objects for full social metadata.
+4. **Test** by visiting `/opengraph-image`, `/icon`, `/apple-icon` directly in dev.
+5. **Debug caching** - WhatsApp aggressively caches. Use Facebook's debug tool: https://developers.facebook.com/tools/debug/
 
 ---
 
 ## Development Workflow
 
-### For Clear, Straightforward Tasks
-Just do it. Skip planning for obvious features - say "add a settings page" and let the agent figure it out.
+### For Simple Tasks
+Skip planning. Just implement obvious features directly.
 
-### For Ambiguous or Complex Features
-Follow this structured process:
+### For Complex or Ambiguous Features
 
-1. **Create PRD** - `Use @workflows/create-prd.md to build: [feature description]`
-2. **Generate Tasks** - `Create tasks from @tasks/prd-[feature].md using @workflows/generate-tasks.md`
-3. **Execute** - Work through tasks incrementally, checking off as completed
+Follow the PRD workflow in `@workflows/create-prd.md`:
 
-Reserve detailed planning for genuinely ambiguous architectural decisions.
+1. **Plan** - Create PRD with clarifying questions, generate tasks
+2. **Implement** - Work through tasks incrementally
+3. **Test** - Write tests, run full test suite
+4. **Verify** - Staff engineer review: Is this over-engineered? Under-engineered?
+5. **Commit** - Only after verification passes
 
 ### Plan Mode Rules
-**Start most sessions in Plan mode (shift+tab twice).** Iterate on the plan until it's solid, then switch to auto-accept and Claude can usually 1-shot it.
 
-- **Extreme concision** - sacrifice grammar for brevity. No fluff, no filler.
+When in plan mode:
+- **Extreme concision** - bullet points, no fluff
 - **End with unresolved questions** - list anything blocking or unclear
 - **Scannable format** - bullet points over paragraphs
-- **When things go sideways** - stop pushing, switch back to plan mode, re-plan
-- **Staff engineer review** - have a second Claude review the plan before implementing
 
-The loop: **Plan → Implement → Test → Verify → Commit → Repeat**
+When things go sideways, stop pushing - switch back to plan mode and re-plan.
 
 ### Branch Cleanup After PRs
+
 After merging PRs:
 1. GitHub auto-deletes remote branches on merge (if enabled in repo settings)
 2. Run `git fetch --prune` to remove stale remote refs locally
 3. Switch to main: `git checkout main && git pull`
 4. Delete local feature branch: `git branch -d <branch-name>`
-
-### Task Tracking
-- Check `tasks/` directory for task files to see outstanding work before starting
 
 ---
 
@@ -314,6 +272,6 @@ Check `.claude/settings.json` for current allowlist.
 
 - Don't over-engineer tooling (no custom agent frameworks)
 - Don't use excessive MCPs - they clutter context
-- Don't write perfect prompts - iterate instead
-- Don't review every line of generated code - focus on outcomes
 - Don't wait for remote CI - run tests locally
+- Don't add features beyond what was asked
+- Don't create abstractions for one-time operations
