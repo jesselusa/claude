@@ -46,7 +46,7 @@ Copy workflows to your project or reference from this repo:
 
 ```bash
 # Copy to project
-cp -r ~/Documents/GitHub/jl-claude-assistant/workflows /path/to/project/
+cp -r ~/Documents/GitHub/claude/workflows /path/to/project/
 
 # Create tasks directory
 mkdir -p /path/to/project/tasks
