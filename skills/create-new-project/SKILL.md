@@ -1,6 +1,6 @@
 ---
 name: create-new-project
-description: Scaffold a new project with CLAUDE.md, .gitignore, and optional PRD workflow
+description: Scaffold a new project with CLAUDE.md, .gitignore, README, and optional PRD workflow
 argument-hint: [project-name] [--nextjs|--python|--minimal]
 ---
 
@@ -16,15 +16,15 @@ Scaffold a new project folder with all the setup from this starter configuration
 - `--minimal`: Use minimal starter template
 - (no modifier): Ask user to choose
 
+**IMPORTANT:** Use the `AskUserQuestion` tool for ALL questions in this skill. Never type questions as plain text.
+
 ---
 
 ## Step 1: Project Name
 
-**Ask first** (if not provided in arguments):
+**Ask first** (if not provided in arguments) using `AskUserQuestion`:
 
-```
-What should this project be called?
-```
+Question: "What should this project be called?" — use a text input (no options needed, user types the name).
 
 Validate: lowercase, hyphens allowed, no spaces. If invalid, suggest a fixed version and confirm.
 
@@ -34,18 +34,16 @@ Validate: lowercase, hyphens allowed, no spaces. If invalid, suggest a fixed ver
 
 ## Step 2: Tech Stack
 
-**Ask second** (if no modifier like `--nextjs` provided):
+**Ask second** (if no modifier like `--nextjs` provided) using `AskUserQuestion`:
 
-```
-What's the tech stack?
-
-1. Next.js + Supabase + Tailwind (web apps)
+Question: "What's the tech stack?"
+Options:
+1. Next.js + Supabase + Tailwind (web apps) — Recommended
 2. Python (scripts, CLI, APIs)
 3. Minimal (just CLAUDE.md + .gitignore)
 4. Other (describe your stack)
-```
 
-If user selects 4 (Other), ask them to describe their stack, then adapt the CLAUDE.md template accordingly.
+If user selects Other, ask them to describe their stack, then adapt the CLAUDE.md template accordingly.
 
 **Wait for response before proceeding.**
 
@@ -53,18 +51,16 @@ If user selects 4 (Other), ask them to describe their stack, then adapt the CLAU
 
 ## Step 3: Project Location
 
-**Ask third:**
+**Ask third** using `AskUserQuestion`:
 
-```
-Where should I create the project?
-
-1. ~/Documents/GitHub/[project-name] (Recommended)
+Question: "Where should I create the project?"
+Options:
+1. ~/Documents/GitHub/[project-name] — Recommended
 2. ~/Projects/[project-name]
 3. Current directory ./[project-name]
 4. Other (specify path)
-```
 
-If user selects 4 (Other), ask for the full path.
+If user selects Other, ask for the full path.
 
 **Wait for response before proceeding.**
 
@@ -72,11 +68,12 @@ If user selects 4 (Other), ask for the full path.
 
 ## Step 4: Project Description
 
-**Ask fourth:**
+**Ask fourth** using `AskUserQuestion`:
 
-```
-Briefly describe what this project will do (1-2 sentences):
-```
+Question: "Briefly describe what this project will do (1-2 sentences)"
+Options:
+- If a PRD or description was already provided in the conversation, offer "Use provided description" as the first option
+- "Custom description" as the second option
 
 **Wait for response before proceeding.**
 
@@ -95,6 +92,7 @@ cd "[PROJECT_PATH]"
 
 ```bash
 git init
+git branch -m master main
 ```
 
 ### 5.3 Copy Template Files
@@ -206,38 +204,62 @@ Update the CLAUDE.md template with project-specific info:
 1. Replace `<!-- Brief description of what this project does -->` with user's description
 2. Add any project-specific conventions mentioned
 
+### 5.5 Generate README.md
+
+Create a README.md with:
+- Project name as heading
+- User's project description
+- Tech stack summary
+- Setup instructions (install, env vars, run dev server)
+- Brief architecture overview if the project has multiple components
+
+Keep it concise — this is a starter README, not full documentation.
+
 ---
 
 ## Step 6: Project-Type Specific Setup
 
 ### If Next.js was selected:
 
-**Ask:**
-```
-Do you want me to initialize the Next.js project now?
+**Ask using `AskUserQuestion`:**
 
-1. Yes, run create-next-app with recommended settings (Recommended)
+Question: "Do you want me to initialize the Next.js project now?"
+Options:
+1. Yes, initialize with recommended settings — Recommended
 2. No, I'll set it up manually later
-```
 
 **Wait for response.**
 
-If 1, run:
+If yes:
+
+**IMPORTANT:** `create-next-app` refuses to run in a directory with existing files (like CLAUDE.md, README.md). Use this workaround:
+
 ```bash
-pnpm create next-app . --typescript --tailwind --eslint --app --src-dir=false --import-alias="@/*" --use-pnpm
+# Init in a temp directory
+cd [PARENT_DIR]
+npx create-next-app@latest [project-name]-init --typescript --tailwind --eslint --app --no-src-dir --import-alias="@/*" --use-pnpm --yes
+
+# Copy Next.js files into the real project (preserve our files)
+rsync -av --exclude='.git' --exclude='.next' --exclude='node_modules' --exclude='README.md' [project-name]-init/ [project-name]/
+
+# Clean up temp dir and install
+rm -rf [project-name]-init
+cd [PROJECT_PATH]
+pnpm install
 ```
 
-**Then ask:**
-```
-Will this project use Supabase?
+Note: Next.js generates its own `.gitignore` with `.env*` pattern. Add `!.env.local.example` exception if creating an example env file.
 
-1. Yes, install Supabase packages (Recommended)
+**Then ask using `AskUserQuestion`:**
+
+Question: "Will this project use Supabase?"
+Options:
+1. Yes, install Supabase packages — Recommended
 2. No
-```
 
 **Wait for response.**
 
-If 1:
+If yes:
 ```bash
 pnpm add @supabase/supabase-js @supabase/ssr
 ```
@@ -250,14 +272,13 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 ### If Python was selected:
 
-**Ask:**
-```
-How should I set up the Python environment?
+**Ask using `AskUserQuestion`:**
 
-1. Create venv + requirements.txt (Recommended)
+Question: "How should I set up the Python environment?"
+Options:
+1. Create venv + requirements.txt — Recommended
 2. Use uv (faster, modern)
 3. Skip, I'll handle it
-```
 
 **Wait for response.**
 
@@ -280,13 +301,12 @@ Use the user's described stack to create an appropriate CLAUDE.md with relevant 
 
 ## Step 7: Optional PRD Workflow
 
-**Ask:**
-```
-Do you want to create a PRD (Product Requirements Document) for your first feature?
+**Ask using `AskUserQuestion`:**
 
-1. Yes, let's plan what to build (Recommended for new projects)
+Question: "Do you want to create a PRD for your first feature?"
+Options:
+1. Yes, let's plan what to build — Recommended for new projects
 2. No, I'll start coding directly
-```
 
 **Wait for response.**
 
@@ -321,14 +341,13 @@ Follow the create-prd.md workflow step-by-step:
 
 ## Step 8: Optional GitHub Setup
 
-**Ask:**
-```
-Do you want to create a GitHub repository for this project?
+**Ask using `AskUserQuestion`:**
 
-1. Yes, create public repo and push (Recommended)
-2. Yes, create private repo and push
+Question: "Do you want to create a GitHub repository?"
+Options:
+1. Yes, create private repo and push — Recommended
+2. Yes, create public repo and push
 3. No, keep local only for now
-```
 
 **Wait for response.**
 
@@ -371,6 +390,11 @@ gh repo create [project-name] --public --source=. --remote=origin --push
 gh repo create [project-name] --private --source=. --remote=origin --push
 ```
 
+After creating the repo, set `origin/HEAD` so Claude Code tools work correctly:
+```bash
+git remote set-head origin main
+```
+
 ### 8.4 Report Success
 
 ```
@@ -393,6 +417,7 @@ Output a summary:
 
 ### Files Created
 - CLAUDE.md (project configuration)
+- README.md (project overview and setup)
 - .gitignore ([X] patterns)
 [- package.json (if Next.js)]
 [- requirements.txt (if Python)]
