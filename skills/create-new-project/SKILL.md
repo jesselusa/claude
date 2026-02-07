@@ -390,6 +390,11 @@ gh repo create [project-name] --public --source=. --remote=origin --push
 gh repo create [project-name] --private --source=. --remote=origin --push
 ```
 
+After creating the repo, set `origin/HEAD` so Claude Code tools work correctly:
+```bash
+git remote set-head origin main
+```
+
 ### 8.4 Report Success
 
 ```
