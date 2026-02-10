@@ -52,6 +52,7 @@ cp templates/nextjs.md /path/to/project/CLAUDE.md
 | `/techdebt` | End-of-session cleanup (dead code, duplicates, TODOs) |
 | `/claude-cleanup` | Scan and redact secrets from Claude memory |
 | `/cleanup` | Rename files to `Source-Title-date.ext` convention |
+| `/learn` | Review session and suggest CLAUDE.md updates |
 | `/create-new-project` | Scaffold new project with templates, optional PRD & GitHub |
 | `/create-readme` | Generate README.md and LICENSE |
 | `/gitignore` | Generate .gitignore by project type |
@@ -143,7 +144,7 @@ Keep instructions concise - verbose guidance wastes tokens.
 ### Languages & Stack
 - **Primary**: TypeScript/JavaScript, Python
 - **Frontend**: Next.js (App Router) with React
-- **Styling**: Tailwind CSS
+- **Styling**: Tailwind CSS + ShadCN UI
 - **Backend**: Supabase (Postgres, Auth, Realtime)
 - **Deployment**: Vercel
 
@@ -161,7 +162,7 @@ Keep instructions concise - verbose guidance wastes tokens.
 - **Commit format**: `type: description` (e.g., `feat: add login`, `fix: timezone bug`)
   - Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
 - **PR creation**: Always use `--assignee @me` when creating PRs with `gh pr create`
-- **Asking questions**: Always use `AskUserQuestion` tool when asking questions - provides a clean UI for selections, confirmations, and multi-choice decisions
+- **Asking questions**: ALWAYS use the `AskUserQuestion` tool when asking the user anything with options — never list options as plain text. This applies to confirmations, multi-choice decisions, preference questions, and any prompt where the user picks from choices
 
 ### Safety Rules
 - Never expose environment variables in code or logs
