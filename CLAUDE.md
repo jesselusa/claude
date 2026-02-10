@@ -56,6 +56,7 @@ cp templates/nextjs.md /path/to/project/CLAUDE.md
 | `/create-new-project` | Scaffold new project with templates, optional PRD & GitHub |
 | `/create-readme` | Generate README.md and LICENSE |
 | `/gitignore` | Generate .gitignore by project type |
+| `/git-cleanup` | Prune stale refs and delete merged local branches |
 | `/kill-ports` | Find and kill processes on TCP ports |
 | `/robots` | Generate robots.txt with AI/SEO blocking |
 | `/sync-starter` | Sync improvements back to this starter template |
@@ -66,7 +67,8 @@ cp templates/nextjs.md /path/to/project/CLAUDE.md
 
 At the start of every session:
 1. Run `git pull` to ensure you have the latest code
-2. Check `tasks/` directory for outstanding work
+2. Run `/git-cleanup` to prune branches from merged PRs
+3. Check `tasks/` directory for outstanding work
 
 ---
 
@@ -125,6 +127,8 @@ skill-name/
 ```
 
 **Location:** `skills/<name>/SKILL.md` - Claude Code finds them automatically after symlinking to `~/.claude/skills/`
+
+**After creating a skill:** Update both the skills table in CLAUDE.md and README.md.
 
 ---
 

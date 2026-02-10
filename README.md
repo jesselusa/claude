@@ -40,6 +40,7 @@ Custom slash commands available after installation:
 | `/create-new-project` | Scaffold new project with templates, optional PRD, optional GitHub repo |
 | `/create-readme` | Generate README.md and LICENSE |
 | `/gitignore` | Generate .gitignore by project type |
+| `/git-cleanup` | Prune stale refs and delete merged local branches |
 | `/kill-ports` | Find and kill processes on TCP ports |
 | `/robots` | Generate robots.txt with AI/SEO blocking |
 | `/sync-starter` | Sync improvements to starter template |
