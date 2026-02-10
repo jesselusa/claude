@@ -1,21 +1,23 @@
 ---
 name: sync-starter
-description: Sync generic learnings from project files back to starter template
-argument-hint: [--dry-run] [--no-pr] [--claude] [--agents] [--gitignore] [--robots]
+description: Sync content between project files and starter template
+argument-hint: --push|--pull [--dry-run] [--no-pr] [--claude] [--agents] [--gitignore] [--robots]
 disable-model-invocation: true
 ---
 
-# Sync to Starter Template
+# Sync Starter Template
 
-Extract generic, reusable content from the current project and sync it back to the starter template repository. Confirms each item individually before syncing.
+Bidirectional sync between the current project and the starter template repository. Push generic learnings to the starter, or pull updates from the starter into the current project. Confirms each item individually before syncing.
 
 **Argument:** $ARGUMENTS
 
-**Default behavior:** Analyze all syncable files for generic content, confirm each item with user, then create a PR with approved changes.
+**Default behavior:** Ask the user which direction to sync, then analyze files and confirm each item.
 
 **Modifiers:**
+- `--push`: Sync FROM current project TO starter template (create PR)
+- `--pull`: Sync FROM starter template TO current project (local changes)
 - `--dry-run` or `-n`: Show what would change without modifying
-- `--no-pr`: Apply changes locally but don't push or create PR
+- `--no-pr`: (push only) Apply changes locally but don't push or create PR
 - `--claude`: Only sync CLAUDE.md
 - `--agents`: Only sync agents.md
 - `--gitignore`: Only sync .gitignore
@@ -73,7 +75,21 @@ Only sync content that is **generic and reusable across any project**.
 - Site-specific paths
 - Custom allow/disallow rules
 
-## Execution Steps
+## Step 0: Direction Selection
+
+1. If `--push` is in the arguments -> use the **Push Direction** flow
+2. If `--pull` is in the arguments -> use the **Pull Direction** flow
+3. Otherwise -> use AskUserQuestion:
+   - header: "Direction"
+   - options:
+     - "Push to starter" / "Sync generic learnings FROM this project TO the starter template (creates PR)"
+     - "Pull from starter" / "Sync updates FROM the starter template INTO this project (local changes)"
+
+---
+
+## Push Direction
+
+Push generic, reusable content from the current project to the starter template repository.
 
 ### 1. Validate Environment
 
@@ -203,7 +219,144 @@ The `gh pr create` command will output the PR URL.
 rm -rf "$TEMP_DIR"
 ```
 
-## Output Format
+---
+
+## Pull Direction
+
+Pull generic, reusable content from the starter template into the current project.
+
+### 1. Validate Environment
+
+Check current directory is not the starter repo itself:
+```bash
+git remote get-url origin 2>/dev/null | grep -q "jesselusa/claude"
+```
+
+If match found, abort: "Cannot pull starter into itself. Run this from a project directory."
+
+### 2. Fetch Starter Files from GitHub
+
+Determine which files to sync based on modifiers (default: all).
+
+Fetch starter files:
+```bash
+gh api repos/jesselusa/claude/contents/CLAUDE.md --jq '.content' | base64 -d
+gh api repos/jesselusa/claude/contents/.gitignore --jq '.content' | base64 -d
+gh api repos/jesselusa/claude/contents/robots.txt --jq '.content' | base64 -d
+```
+
+Skip files based on modifiers (`--claude`, `--gitignore`, `--robots`).
+
+### 3. Read Current Project Files
+
+Read the corresponding project files (skip any that don't exist):
+```bash
+cat ./CLAUDE.md
+cat ./.gitignore
+cat ./robots.txt
+```
+
+### 4. Diff - Find Content in Starter NOT in Project
+
+Compare starter content against project files to find items worth pulling.
+
+#### CLAUDE.md
+
+Extract generic items from the starter that are missing from the project:
+- Workflow rules and patterns
+- Safety rules and security practices
+- Code style preferences
+- Design principles
+- Testing approaches
+- Tooling preferences
+- General best practices
+
+**DO NOT pull starter-specific content:**
+- Skills table (Available Skills section)
+- Starter repo structure (skills/, hooks/, mcp-servers/, templates/, workflows/)
+- Installation commands (symlink commands, `mkdir -p ~/.claude/skills`)
+- Permissions config (`/permissions`, allowlist references)
+- Paths referencing `~/Documents/GitHub/claude`
+- Repository purpose section
+- Creating New Skills section
+- Development Commands section
+
+#### .gitignore
+
+Line-by-line diff. Flag generic patterns in the starter that are missing from the project's .gitignore.
+
+#### robots.txt
+
+Find User-agent blocks in the starter that are not in the project. If the project has no robots.txt, offer to create one from the starter.
+
+### 5. Confirm Each Item
+
+Use AskUserQuestion for each item or group:
+
+**CLAUDE.md items** - confirm one-by-one:
+```
+Found in starter, missing from project:
+
+Category: [Workflow/Style/Safety/Tooling/Design/Testing]
+Content: "[the actual content]"
+
+Add this to your project's CLAUDE.md?
+```
+
+Options:
+- "Yes, add this"
+- "No, skip this"
+- "Edit before adding" (user provides modified version)
+
+**For .gitignore and robots.txt** - batch by section:
+
+Options:
+- "Add all" (add all missing items from this section)
+- "Skip" (skip all items from this section)
+- "Pick individually" (confirm each item one by one)
+
+### 6. Apply Approved Items
+
+Apply changes directly to project files using Edit/Write tools. No clone, no PR - changes are local and unstaged.
+
+For CLAUDE.md:
+- Add approved items to the appropriate section in the project's CLAUDE.md
+- If the section doesn't exist, create it
+- Preserve the project's existing structure and project-specific content
+
+For .gitignore:
+- Append approved patterns to the project's .gitignore
+- Group by category with comments if adding multiple patterns
+
+For robots.txt:
+- Append approved User-agent blocks to the project's robots.txt
+- If creating a new robots.txt, use the starter's content as the base (minus project-specific rules)
+
+If `--dry-run` is active, show what would change but don't modify any files.
+
+### 7. Summary
+
+Output a summary:
+```
+## Starter Template Pull - [project-name]
+
+Source: github.com/jesselusa/claude
+
+### Changes Applied
+- [list of items added, grouped by file]
+
+### Skipped
+- [list of items the user chose to skip]
+
+### Files Modified
+- [list of files that were changed]
+
+Reminder: Changes are local and unstaged. Run `git diff` to review, then commit when ready.
+```
+
+---
+
+## Output Format (Push)
 
 ```
 ## Starter Template Sync - [project-name]
