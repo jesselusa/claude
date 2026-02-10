@@ -43,7 +43,7 @@ Custom slash commands available after installation:
 | `/git-cleanup` | Prune stale refs and delete merged local branches |
 | `/kill-ports` | Find and kill processes on TCP ports |
 | `/robots` | Generate robots.txt with AI/SEO blocking |
-| `/sync-starter` | Sync improvements to starter template |
+| `/sync-starter` | Sync content between projects and starter template |
 
 Based on [dcnu/claude](https://github.com/dcnu/claude).
 

@@ -14,7 +14,7 @@ Custom skills (slash commands) for Claude Code. Based on [dcnu/claude](https://g
 | Gitignore | `/gitignore` | Generate .gitignore based on detected project type |
 | Kill Ports | `/kill-ports` | Find and kill processes listening on TCP ports |
 | Robots | `/robots` | Generate robots.txt with AI/SEO blocking options |
-| Sync Starter | `/sync-starter` | Sync improvements back to starter template repo |
+| Sync Starter | `/sync-starter` | Sync content between projects and starter template |
 
 ## Installation
 

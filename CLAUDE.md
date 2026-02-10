@@ -59,7 +59,7 @@ cp templates/nextjs.md /path/to/project/CLAUDE.md
 | `/git-cleanup` | Prune stale refs and delete merged local branches |
 | `/kill-ports` | Find and kill processes on TCP ports |
 | `/robots` | Generate robots.txt with AI/SEO blocking |
-| `/sync-starter` | Sync improvements back to this starter template |
+| `/sync-starter` | Sync content between projects and starter template |
 
 ---
 
