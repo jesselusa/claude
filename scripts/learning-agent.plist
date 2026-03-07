@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.jesselusa.learning-agent</string>
+
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/bin/python3</string>
+		<string>/Users/jesselusa/Documents/GitHub/claude/scripts/learning-agent.py</string>
+	</array>
+
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>9</integer>
+		<key>Minute</key>
+		<integer>0</integer>
+	</dict>
+
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+		<key>HOME</key>
+		<string>/Users/jesselusa</string>
+	</dict>
+
+	<key>StandardOutPath</key>
+	<string>/Users/jesselusa/.claude/learning-agent/launchd.log</string>
+
+	<key>StandardErrorPath</key>
+	<string>/Users/jesselusa/.claude/learning-agent/launchd-error.log</string>
+
+	<key>RunAtLoad</key>
+	<false/>
+</dict>
+</plist>
