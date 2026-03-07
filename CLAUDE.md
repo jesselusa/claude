@@ -145,7 +145,12 @@ skill-name/
 
 **Location:** `skills/<name>/SKILL.md` - Claude Code finds them automatically after symlinking to `~/.claude/skills/`
 
-**After creating a skill:** Update both the skills table in CLAUDE.md and README.md.
+**After creating a skill:** Update both the skills table in CLAUDE.md and README.md. Then re-run the symlink command so the new skill is immediately available:
+```bash
+for skill in ~/Documents/GitHub/claude/skills/*/; do ln -sf "$skill" ~/.claude/skills/; done
+```
+
+**When adding Python scripts:** Immediately add `__pycache__/` (or the script directory's cache path) to `.gitignore` before running the script for the first time, to avoid accidentally committing bytecode.
 
 ---
 
