@@ -44,6 +44,11 @@ Custom slash commands available after installation:
 | `/kill-ports` | Find and kill processes on TCP ports |
 | `/robots` | Generate robots.txt with AI/SEO blocking |
 | `/sync-starter` | Sync content between projects and starter template |
+| `/commit-pr` | Lint → typecheck → commit → push → create PR on feature branch |
+| `/tasks` | View and update outstanding tasks in the tasks/ directory |
+| `/session-end` | End-of-session wrapper: runs /techdebt → /learn → /git-cleanup in sequence |
+| `/setup-integration` | Scaffold third-party service setup (Stripe, Notion, Twilio, Cloudinary, Supabase) |
+| `/security-patch` | Check dependabot alerts across all repos, auto-patch, create PRs |
 
 Based on [dcnu/claude](https://github.com/dcnu/claude).
 

@@ -60,6 +60,11 @@ cp templates/nextjs.md /path/to/project/CLAUDE.md
 | `/kill-ports` | Find and kill processes on TCP ports |
 | `/robots` | Generate robots.txt with AI/SEO blocking |
 | `/sync-starter` | Sync content between projects and starter template |
+| `/commit-pr` | Lint → typecheck → commit → push → create PR on feature branch |
+| `/tasks` | View and update outstanding tasks in the tasks/ directory |
+| `/session-end` | End-of-session wrapper: runs /techdebt → /learn → /git-cleanup in sequence |
+| `/setup-integration` | Scaffold third-party service setup (Stripe, Notion, Twilio, Cloudinary, Supabase) |
+| `/security-patch` | Check dependabot alerts across all repos, auto-patch, create PRs |
 
 ---
 
@@ -84,6 +89,18 @@ When tasks are independent (don't touch same files), use parallel agents:
 
 ### Stay Focused
 Focus on one concern per task. If asked about unrelated work, suggest starting a fresh context.
+
+### Always Use Feature Branches
+Never commit directly to main. If already on main when asked to commit, create a feature branch first and ask for a name.
+
+### End-of-Session Checklist
+Before signing off, always run `/techdebt` → `/learn` → `/git-cleanup` in that order. Proactively offer this at the end of every session.
+
+### Multi-Repo Awareness
+When cleaning up branches, default to checking all 4 repos: pokecrm, little-language-labs, palette, jesselusa.com — unless a specific repo is specified.
+
+### Proactively Share Session Learnings
+At the end of every session, volunteer what you learned and ask if it should go into CLAUDE.md before the user has to ask.
 
 ---
 
