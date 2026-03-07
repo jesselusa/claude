@@ -183,7 +183,7 @@ Keep instructions concise - verbose guidance wastes tokens.
 - **Commit format**: `type: description` (e.g., `feat: add login`, `fix: timezone bug`)
   - Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
 - **PR creation**: Always use `--assignee @me` when creating PRs with `gh pr create`
-- **Asking questions**: ALWAYS use the `AskUserQuestion` tool when asking the user anything with options — never list options as plain text. This applies to confirmations, multi-choice decisions, preference questions, and any prompt where the user picks from choices
+- **Asking questions**: ALWAYS use the `AskUserQuestion` tool when asking the user anything with options — never list options as plain text. This applies to confirmations, multi-choice decisions, preference questions, and any prompt where the user picks from choices. This is non-negotiable — do not ask questions by writing numbered or bulleted lists in text. Load the tool via ToolSearch if needed and use it every time.
 
 ### Safety Rules
 - Never expose environment variables in code or logs
