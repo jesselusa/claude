@@ -182,6 +182,7 @@ Keep instructions concise - verbose guidance wastes tokens.
 - Use tabs for indentation (not spaces)
 - Always use existing components first - check `components/ui/` before creating new UI elements
 
+- For externally-hosted images, keep skeleton/placeholder visible until the image element's onLoad fires — not just until the data fetch completes.
 ### Tooling
 - **Package manager**: `pnpm` (not npm/yarn)
 - **Pre-build**: Always run `lint` + `type-check` before builds
