@@ -7,7 +7,7 @@
 
 	<key>ProgramArguments</key>
 	<array>
-		<string>/usr/bin/python3</string>
+		<string>/opt/homebrew/bin/python3</string>
 		<string>/Users/jesselusa/Documents/GitHub/claude/scripts/learning-agent.py</string>
 	</array>
 
@@ -22,7 +22,7 @@
 	<key>EnvironmentVariables</key>
 	<dict>
 		<key>PATH</key>
-		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+		<string>/Users/jesselusa/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
 		<key>HOME</key>
 		<string>/Users/jesselusa</string>
 	</dict>
