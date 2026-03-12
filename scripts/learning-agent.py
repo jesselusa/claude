@@ -272,10 +272,11 @@ def extract_learnings(claude_md_content: str, session_text: str) -> list[dict]:
     raw = run_claude(build_extraction_prompt(claude_md_content, session_text))
     log.debug("Claude raw output:\n%s", raw)
 
-    if raw is None or "NOTHING_NEW" in raw:
-        log.info("No new learnings found.")
+    if raw is None:
+        log.info("No output from Claude.")
         return []
 
+    # Parse valid lines first — Claude may include commentary alongside valid output
     learnings: list[dict] = []
     for line in raw.splitlines():
         line = line.strip()
@@ -291,7 +292,10 @@ def extract_learnings(claude_md_content: str, session_text: str) -> list[dict]:
             if name and description:
                 learnings.append({"type": "SKILL", "name": name, "description": description, "summary": summary})
 
-    log.info("Parsed %d learning(s)", len(learnings))
+    if not learnings:
+        log.info("No new learnings found.")
+    else:
+        log.info("Parsed %d learning(s)", len(learnings))
     return learnings
 
 
