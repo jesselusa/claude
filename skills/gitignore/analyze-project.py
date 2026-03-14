@@ -173,7 +173,6 @@ def check_missing_critical(existing_patterns: list[str], project_dir: Path) -> l
 
 		if not pattern_covered:
 			if "*" in pattern:
-				import glob
 				matches = list(project_dir.glob(pattern))
 				if matches:
 					missing.append({

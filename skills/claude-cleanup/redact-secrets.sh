@@ -30,16 +30,7 @@ echo ""
 
 # Count secrets before
 count_secrets() {
-	local f="$1"
-	local count=0
-	count=$((count + $(grep -oE 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+' "$f" 2>/dev/null | wc -l | tr -d ' ')))
-	count=$((count + $(grep -oE 'sk-[A-Za-z0-9]{20,}' "$f" 2>/dev/null | wc -l | tr -d ' ')))
-	count=$((count + $(grep -oE 'sk-ant-[A-Za-z0-9_-]{20,}' "$f" 2>/dev/null | wc -l | tr -d ' ')))
-	count=$((count + $(grep -oE 'gh[poas]_[A-Za-z0-9]{36}' "$f" 2>/dev/null | wc -l | tr -d ' ')))
-	count=$((count + $(grep -oE 'AKIA[0-9A-Z]{16}' "$f" 2>/dev/null | wc -l | tr -d ' ')))
-	count=$((count + $(grep -oE 'sk_(live|test)_[A-Za-z0-9]{24,}' "$f" 2>/dev/null | wc -l | tr -d ' ')))
-	count=$((count + $(grep -oE 'xox[bp]-[A-Za-z0-9-]+' "$f" 2>/dev/null | wc -l | tr -d ' ')))
-	echo "$count"
+	grep -oE 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+|sk-ant-[A-Za-z0-9_-]{20,}|sk-[A-Za-z0-9]{20,}|gh[poas]_[A-Za-z0-9]{36}|AKIA[0-9A-Z]{16}|sk_(live|test)_[A-Za-z0-9]{24,}|xox[bp]-[A-Za-z0-9-]+' "$1" 2>/dev/null | wc -l | tr -d ' '
 }
 
 BEFORE=$(count_secrets "$FILE")
@@ -59,46 +50,25 @@ fi
 echo ""
 echo "Redacting..."
 
-# JWT tokens (most common in Claude history)
-sed -i '' 's/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*/<REDACTED_JWT>/g' "$FILE"
-
-# OpenAI API keys
-sed -i '' 's/sk-[A-Za-z0-9]\{20,\}/<REDACTED_OPENAI_KEY>/g' "$FILE"
-
-# Anthropic API keys
-sed -i '' 's/sk-ant-[A-Za-z0-9_-]\{20,\}/<REDACTED_ANTHROPIC_KEY>/g' "$FILE"
-
-# GitHub Personal Access Tokens
-sed -i '' 's/ghp_[A-Za-z0-9]\{36\}/<REDACTED_GITHUB_PAT>/g' "$FILE"
-
-# GitHub OAuth tokens
-sed -i '' 's/gho_[A-Za-z0-9]\{36\}/<REDACTED_GITHUB_OAUTH>/g' "$FILE"
-
-# GitHub App tokens
-sed -i '' 's/ghs_[A-Za-z0-9]\{36\}/<REDACTED_GITHUB_APP>/g' "$FILE"
-
-# GitHub Refresh tokens
-sed -i '' 's/ghr_[A-Za-z0-9]\{36\}/<REDACTED_GITHUB_REFRESH>/g' "$FILE"
-
-# AWS Access Key IDs
-sed -i '' 's/AKIA[0-9A-Z]\{16\}/<REDACTED_AWS_KEY>/g' "$FILE"
-
-# Stripe Live keys
-sed -i '' 's/sk_live_[A-Za-z0-9]\{24,\}/<REDACTED_STRIPE_LIVE>/g' "$FILE"
-
-# Stripe Test keys
-sed -i '' 's/sk_test_[A-Za-z0-9]\{24,\}/<REDACTED_STRIPE_TEST>/g' "$FILE"
-
-# Slack Bot tokens
-sed -i '' 's/xoxb-[A-Za-z0-9-]*/<REDACTED_SLACK_BOT>/g' "$FILE"
-
-# Slack User tokens
-sed -i '' 's/xoxp-[A-Za-z0-9-]*/<REDACTED_SLACK_USER>/g' "$FILE"
-
-# Database URLs (redact password only, preserve structure)
-sed -i '' 's/\(postgres:\/\/[^:]*\):[^@]*@/\1:<REDACTED>@/g' "$FILE"
-sed -i '' 's/\(mysql:\/\/[^:]*\):[^@]*@/\1:<REDACTED>@/g' "$FILE"
-sed -i '' 's/\(mongodb:\/\/[^:]*\):[^@]*@/\1:<REDACTED>@/g' "$FILE"
+# Redact all secret patterns in a single sed pass (1 file I/O instead of 15).
+# NOTE: Anthropic (sk-ant-) must come before generic OpenAI (sk-) to avoid mislabeling.
+sed -i '' \
+	-e 's/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*/<REDACTED_JWT>/g' \
+	-e 's/sk-ant-[A-Za-z0-9_-]\{20,\}/<REDACTED_ANTHROPIC_KEY>/g' \
+	-e 's/sk_live_[A-Za-z0-9]\{24,\}/<REDACTED_STRIPE_LIVE>/g' \
+	-e 's/sk_test_[A-Za-z0-9]\{24,\}/<REDACTED_STRIPE_TEST>/g' \
+	-e 's/sk-[A-Za-z0-9]\{20,\}/<REDACTED_OPENAI_KEY>/g' \
+	-e 's/ghp_[A-Za-z0-9]\{36\}/<REDACTED_GITHUB_PAT>/g' \
+	-e 's/gho_[A-Za-z0-9]\{36\}/<REDACTED_GITHUB_OAUTH>/g' \
+	-e 's/ghs_[A-Za-z0-9]\{36\}/<REDACTED_GITHUB_APP>/g' \
+	-e 's/ghr_[A-Za-z0-9]\{36\}/<REDACTED_GITHUB_REFRESH>/g' \
+	-e 's/AKIA[0-9A-Z]\{16\}/<REDACTED_AWS_KEY>/g' \
+	-e 's/xoxb-[A-Za-z0-9-]*/<REDACTED_SLACK_BOT>/g' \
+	-e 's/xoxp-[A-Za-z0-9-]*/<REDACTED_SLACK_USER>/g' \
+	-e 's/\(postgres:\/\/[^:]*\):[^@]*@/\1:<REDACTED>@/g' \
+	-e 's/\(mysql:\/\/[^:]*\):[^@]*@/\1:<REDACTED>@/g' \
+	-e 's/\(mongodb:\/\/[^:]*\):[^@]*@/\1:<REDACTED>@/g' \
+	"$FILE"
 
 AFTER=$(count_secrets "$FILE")
 

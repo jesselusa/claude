@@ -24,7 +24,7 @@ logs/
 
 # Supabase local
 /supabase
-scripts/__pycache__/
+__pycache__/
 
 # Task files (local working notes, not committed)
 workflows/tasks/

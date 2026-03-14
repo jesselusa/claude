@@ -14,7 +14,6 @@ Usage:
 
 import argparse
 import json
-import os
 import re
 import sys
 from datetime import datetime
@@ -469,7 +468,7 @@ def main():
 	parser.add_argument(
 		"directory",
 		nargs="?",
-		default=os.path.expanduser("~/Downloads"),
+		default=str(Path.home() / "Downloads"),
 		help="Target directory (default: ~/Downloads)",
 	)
 	parser.add_argument("--list", action="store_true", help="Output JSON suggestions")
