@@ -18,28 +18,13 @@ fi
 
 OSV_API="https://api.osv.dev/v1/query"
 
-# Build the query JSON
+# Build the query JSON safely with jq
 if [[ -n "$VERSION" ]]; then
-	QUERY=$(cat <<EOF
-{
-	"package": {
-		"name": "$PACKAGE",
-		"ecosystem": "$ECOSYSTEM"
-	},
-	"version": "$VERSION"
-}
-EOF
-)
+	QUERY=$(jq -n --arg name "$PACKAGE" --arg eco "$ECOSYSTEM" --arg ver "$VERSION" \
+		'{package: {name: $name, ecosystem: $eco}, version: $ver}')
 else
-	QUERY=$(cat <<EOF
-{
-	"package": {
-		"name": "$PACKAGE",
-		"ecosystem": "$ECOSYSTEM"
-	}
-}
-EOF
-)
+	QUERY=$(jq -n --arg name "$PACKAGE" --arg eco "$ECOSYSTEM" \
+		'{package: {name: $name, ecosystem: $eco}}')
 fi
 
 echo "=== OSV Query for $ECOSYSTEM/$PACKAGE ==="

@@ -70,14 +70,7 @@ elif [[ -f "pyproject.toml" ]]; then
 	VERSION=$(grep -E '^version\s*=' pyproject.toml | head -1 | sed 's/.*=\s*"\(.*\)"/\1/' 2>/dev/null || echo "")
 	DESCRIPTION=$(grep -E '^description\s*=' pyproject.toml | head -1 | sed 's/.*=\s*"\(.*\)"/\1/' 2>/dev/null || echo "")
 
-	# Detect package manager
-	if [[ -f "uv.lock" ]] || [[ -f ".python-version" ]]; then
-		PACKAGE_MANAGER="uv"
-	elif [[ -f "requirements.txt" ]]; then
-		PACKAGE_MANAGER="uv"  # Default per CLAUDE.md
-	else
-		PACKAGE_MANAGER="uv"
-	fi
+	PACKAGE_MANAGER="uv"
 
 	# Detect framework
 	if grep -q "fastapi" pyproject.toml 2>/dev/null; then
@@ -133,20 +126,18 @@ if [[ -z "$NAME" ]]; then
 	NAME=$(basename "$(pwd)")
 fi
 
-# Output JSON
-cat <<EOF
-{
-  "type": "$TYPE",
-  "name": "$NAME",
-  "version": "$VERSION",
-  "description": "$DESCRIPTION",
-  "packageManager": "$PACKAGE_MANAGER",
-  "framework": "$FRAMEWORK",
-  "database": "$DATABASE",
-  "hasTests": $HAS_TESTS,
-  "testCommand": "$TEST_COMMAND",
-  "hasPrisma": $HAS_PRISMA,
-  "hasEnvExample": $HAS_ENV_EXAMPLE,
-  "readmeExists": $README_EXISTS
-}
-EOF
+# Output JSON safely with jq
+jq -n \
+	--arg type "$TYPE" \
+	--arg name "$NAME" \
+	--arg version "$VERSION" \
+	--arg description "$DESCRIPTION" \
+	--arg packageManager "$PACKAGE_MANAGER" \
+	--arg framework "$FRAMEWORK" \
+	--arg database "$DATABASE" \
+	--argjson hasTests "$HAS_TESTS" \
+	--arg testCommand "$TEST_COMMAND" \
+	--argjson hasPrisma "$HAS_PRISMA" \
+	--argjson hasEnvExample "$HAS_ENV_EXAMPLE" \
+	--argjson readmeExists "$README_EXISTS" \
+	'{type: $type, name: $name, version: $version, description: $description, packageManager: $packageManager, framework: $framework, database: $database, hasTests: $hasTests, testCommand: $testCommand, hasPrisma: $hasPrisma, hasEnvExample: $hasEnvExample, readmeExists: $readmeExists}'

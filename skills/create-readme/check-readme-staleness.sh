@@ -49,9 +49,11 @@ if [[ -z "$LAST_README_COMMIT" ]]; then
 	exit 0
 fi
 
-# Count significant changes since last README update
-SIGNIFICANT_CHANGES=$(git diff --name-only "$LAST_README_COMMIT"..HEAD 2>/dev/null | grep -E \
-	'^src/|\.tsx?$|\.py$|^package\.json$|^pyproject\.toml$|^tests?/|^next\.config\.|^prisma/schema\.prisma$|\.env\.example$' | wc -l | tr -d ' ')
+# Cache the changed file list once (was 5 separate git diff calls)
+CHANGED_FILES=$(git diff --name-only "$LAST_README_COMMIT"..HEAD 2>/dev/null)
+
+SIGNIFICANT_CHANGES=$(echo "$CHANGED_FILES" | grep -cE \
+	'^src/|\.tsx?$|\.py$|^package\.json$|^pyproject\.toml$|^tests?/|^next\.config\.|^prisma/schema\.prisma$|\.env\.example$' || echo 0)
 
 THRESHOLD=10
 
@@ -59,10 +61,10 @@ if [[ "$SIGNIFICANT_CHANGES" -lt "$THRESHOLD" ]]; then
 	exit 0
 fi
 
-SRC_CHANGES=$(git diff --name-only "$LAST_README_COMMIT"..HEAD 2>/dev/null | grep -E '^src/|\.tsx?$|\.py$' | wc -l | tr -d ' ')
-DEP_CHANGES=$(git diff --name-only "$LAST_README_COMMIT"..HEAD 2>/dev/null | grep -E '^package\.json$|^pyproject\.toml$' | wc -l | tr -d ' ')
-TEST_CHANGES=$(git diff --name-only "$LAST_README_COMMIT"..HEAD 2>/dev/null | grep -E '^tests?/|\.test\.' | wc -l | tr -d ' ')
-CONFIG_CHANGES=$(git diff --name-only "$LAST_README_COMMIT"..HEAD 2>/dev/null | grep -E '^next\.config\.|^prisma/|\.env\.example$' | wc -l | tr -d ' ')
+SRC_CHANGES=$(echo "$CHANGED_FILES" | grep -cE '^src/|\.tsx?$|\.py$' || echo 0)
+DEP_CHANGES=$(echo "$CHANGED_FILES" | grep -cE '^package\.json$|^pyproject\.toml$' || echo 0)
+TEST_CHANGES=$(echo "$CHANGED_FILES" | grep -cE '^tests?/|\.test\.' || echo 0)
+CONFIG_CHANGES=$(echo "$CHANGED_FILES" | grep -cE '^next\.config\.|^prisma/|\.env\.example$' || echo 0)
 
 SUMMARY="$SIGNIFICANT_CHANGES files changed: ${SRC_CHANGES} source, ${DEP_CHANGES} deps, ${TEST_CHANGES} tests, ${CONFIG_CHANGES} config"
 

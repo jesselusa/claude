@@ -95,17 +95,23 @@ def run_claude(prompt: str) -> str | None:
 
 def branch_exists(repo: Path, branch: str) -> bool:
     """Return True if branch exists locally or on origin."""
-    remote = run(["git", "ls-remote", "--heads", "origin", branch], cwd=repo)
-    if remote.stdout.strip():
-        return True
     local = run(["git", "branch", "--list", branch], cwd=repo)
-    return bool(local.stdout.strip())
+    if local.stdout.strip():
+        return True
+    remote = run(["git", "ls-remote", "--heads", "origin", branch], cwd=repo)
+    return bool(remote.stdout.strip())
 
 
 def has_staged_changes(repo: Path) -> bool:
     """Return True if there are staged changes ready to commit."""
     result = run(["git", "diff", "--cached", "--quiet"], cwd=repo)
     return result.returncode != 0  # exit 1 = has diff
+
+
+def _cleanup_branch(repo: Path) -> None:
+    """Switch back to main and delete the feature branch."""
+    run(["git", "checkout", "main"], cwd=repo)
+    run(["git", "branch", "-d", BRANCH], cwd=repo)
 
 
 def commit_and_open_pr(
@@ -129,20 +135,19 @@ def commit_and_open_pr(
 
     if not has_staged_changes(repo):
         log.info("No changes to commit in %s — skipping PR", repo.name)
-        run(["git", "checkout", "main"], cwd=repo)
-        run(["git", "branch", "-d", BRANCH], cwd=repo)
+        _cleanup_branch(repo)
         return None
 
     result = run(["git", "commit", "-m", commit_msg], cwd=repo)
     if result.returncode != 0:
         log.error("Commit failed in %s: %s", repo.name, result.stderr)
-        run(["git", "checkout", "main"], cwd=repo)
+        _cleanup_branch(repo)
         return None
 
     result = run(["git", "push", "-u", "origin", BRANCH], cwd=repo)
     if result.returncode != 0:
         log.error("Push failed in %s: %s", repo.name, result.stderr)
-        run(["git", "checkout", "main"], cwd=repo)
+        _cleanup_branch(repo)
         return None
 
     result = run(
@@ -300,37 +305,51 @@ def extract_learnings(claude_md_content: str, session_text: str) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
-# Step 4a: Apply RULE learnings to CLAUDE.md
+# Step 4a: Apply RULE learnings — shared insertion logic
 # ---------------------------------------------------------------------------
 
 
-def apply_rules_to_claude_md(learnings: list[dict]) -> tuple[list[str], str]:
+def insert_rules(
+    content: str,
+    rules: list[dict],
+    header_prefixes: tuple[str, ...] = ("### ",),
+) -> tuple[str, list[str]]:
     """
-    Appends new rules to the appropriate sections in CLAUDE.md.
-    Returns (added_descriptions, updated_file_content) — avoids a second disk read.
+    Insert rules into content by matching section headers.
+    Re-scans after each insertion to avoid index drift.
+    Skips rules whose text already appears in the target section.
+    Returns (updated_content, list_of_added_descriptions).
     """
-    claude_md_path = CLAUDE_REPO / CLAUDE_MD_FILE
-    content = claude_md_path.read_text(encoding="utf-8")
-    rules = [l for l in learnings if l["type"] == "RULE"]
-    if not rules:
-        return [], content
-
     lines = content.splitlines(keepends=True)
     added: list[str] = []
 
-    for learning in rules:
-        section, rule = learning["section"], learning["rule"]
-        header = f"### {section}"
+    for rule_dict in rules:
+        section, rule = rule_dict["section"], rule_dict["rule"]
 
-        section_idx = next((i for i, l in enumerate(lines) if l.strip() == header), None)
+        # Find section header
+        section_idx = None
+        for i, l in enumerate(lines):
+            stripped = l.strip()
+            if any(stripped == f"{p}{section}" for p in header_prefixes):
+                section_idx = i
+                break
+
         if section_idx is None:
-            log.warning("Section '%s' not found in CLAUDE.md — skipping rule: %s", section, rule)
+            log.warning("Section '%s' not found — skipping rule: %s", section, rule)
             continue
 
+        # Find next section header or end of file
         insert_idx = next(
-            (i for i in range(section_idx + 1, len(lines)) if lines[i].strip().startswith("###") or lines[i].strip() == "---"),
+            (i for i in range(section_idx + 1, len(lines))
+             if lines[i].strip().startswith("##") or lines[i].strip() == "---"),
             len(lines),
         )
+
+        # Skip if rule text already present in this section
+        section_text = "".join(lines[section_idx:insert_idx]).lower()
+        if rule.lower() in section_text:
+            log.info("Rule already present in section '%s' — skipping: %s", section, rule)
+            continue
 
         rule_line = f"- {rule}\n"
         if insert_idx > 0 and lines[insert_idx - 1].strip():
@@ -341,8 +360,22 @@ def apply_rules_to_claude_md(learnings: list[dict]) -> tuple[list[str], str]:
         added.append(f"[{section}] {rule}")
         log.info("Added rule to '%s': %s", section, rule)
 
-    updated = "".join(lines)
+    return "".join(lines), added
+
+
+def apply_rules_to_claude_md(content: str, learnings: list[dict]) -> tuple[list[str], str]:
+    """
+    Appends new rules to the appropriate sections in CLAUDE.md.
+    Returns (added_descriptions, updated_file_content).
+    """
+    rules = [l for l in learnings if l["type"] == "RULE"]
+    if not rules:
+        return [], content
+
+    updated, added = insert_rules(content, rules, header_prefixes=("### ",))
+
     if added:
+        claude_md_path = CLAUDE_REPO / CLAUDE_MD_FILE
         claude_md_path.write_text(updated, encoding="utf-8")
 
     return added, updated
@@ -405,13 +438,13 @@ def create_claude_repo_pr(added_rules: list[str], created_skills: list[str]) -> 
 
 
 def build_sync_prompt(global_claude_md: str, project_claude_md: str) -> str:
-    return f"""You are merging generic engineering rules from a global CLAUDE.md into a project-specific CLAUDE.md.
+    return f"""You are comparing a global CLAUDE.md against a project-specific CLAUDE.md to find missing generic rules.
 
 ## Global CLAUDE.md (source of new rules)
 
 {global_claude_md}
 
-## Project CLAUDE.md (current content)
+## Project CLAUDE.md (target — DO NOT rewrite this)
 
 {project_claude_md}
 
@@ -421,12 +454,38 @@ Identify any generic rules in the global CLAUDE.md that are NOT yet present in t
 project CLAUDE.md and that would be applicable to a typical software project.
 
 Do NOT include rules that are clearly specific to the global config repo itself
-(e.g. "creating skills", "syncing repositories", etc.).
+(e.g. "creating skills", "syncing repositories", "multi-repo awareness", etc.).
 
-If there are rules to add, output the COMPLETE updated project CLAUDE.md with the
-new rules merged in naturally. Do not add commentary — only output the file contents.
+Output ONLY in this pipe-delimited format (one per line):
 
-If there are no new rules to add, output exactly: NO_CHANGES"""
+  RULE|<section header from the PROJECT file>|<rule text>
+
+Where <section header> must EXACTLY match an existing ## or ### heading in the project
+CLAUDE.md above. Use the project's section names, not the global file's.
+
+Rules:
+- Rule text should be a single concise line (imperative sentence or "**Bold label** — description")
+- Must NOT already be present in the project CLAUDE.md
+- Must be generic (applicable to any project, not config-repo-specific)
+
+If nothing qualifies, output exactly: NO_CHANGES
+
+Do not include any explanation, preamble, or commentary — only the output lines."""
+
+
+def parse_sync_rules(raw: str) -> list[dict]:
+    """Parse RULE|section|text lines from Claude sync output."""
+    rules: list[dict] = []
+    for line in raw.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        parts = line.split("|")
+        if parts[0] == "RULE" and len(parts) >= 3:
+            section, rule = parts[1].strip(), parts[2].strip()
+            if section and rule:
+                rules.append({"section": section, "rule": rule})
+    return rules
 
 
 def sync_project_repo(
@@ -445,14 +504,28 @@ def sync_project_repo(
         return
 
     original_content = project_claude_md_path.read_text(encoding="utf-8")
-    updated_content = run_claude(build_sync_prompt(global_claude_md, original_content))
+    raw_output = run_claude(build_sync_prompt(global_claude_md, original_content))
 
-    if updated_content is None or "NO_CHANGES" in updated_content:
+    if raw_output is None or "NO_CHANGES" in raw_output:
         log.info("No changes for %s — skipping PR", repo_name)
+        return
+
+    rules = parse_sync_rules(raw_output)
+    if not rules:
+        log.info("No valid RULE lines parsed for %s — skipping PR", repo_name)
+        return
+
+    updated_content, added = insert_rules(
+        original_content, rules, header_prefixes=("## ", "### "),
+    )
+
+    if not added:
+        log.info("All rules already present in %s — skipping PR", repo_name)
         return
 
     project_claude_md_path.write_text(updated_content, encoding="utf-8")
 
+    rules_md = "\n".join(f"- {r}" for r in added)
     ref_line = f"\nSee source PR: {claude_repo_pr_url}" if claude_repo_pr_url else ""
     pr_url = commit_and_open_pr(
         repo_path,
@@ -460,7 +533,8 @@ def sync_project_repo(
         f"feat: sync CLAUDE.md learnings {TODAY}",
         f"feat: sync CLAUDE.md learnings {TODAY}",
         f"## Sync CLAUDE.md — {TODAY}\n\nAutomated PR to sync generic engineering rules "
-        f"from the global `jesselusa/claude` config.{ref_line}\n\n---\nGenerated by `scripts/learning-agent.py`",
+        f"from the global `jesselusa/claude` config.{ref_line}\n\n"
+        f"### Rules added\n\n{rules_md}\n\n---\nGenerated by `scripts/learning-agent.py`",
     )
 
     if pr_url is None:
@@ -495,7 +569,7 @@ def main() -> None:
         log.info("No actionable learnings. Exiting.")
         sys.exit(0)
 
-    added_rules, updated_claude_md = apply_rules_to_claude_md(learnings)
+    added_rules, updated_claude_md = apply_rules_to_claude_md(claude_md_content, learnings)
     created_skills = create_skill_stubs(learnings)
 
     if not added_rules and not created_skills:
@@ -507,6 +581,12 @@ def main() -> None:
         claude_repo_pr_url = create_claude_repo_pr(added_rules, created_skills)
     except Exception as exc:
         log.error("Failed to create PR for claude repo: %s", exc)
+
+    # Skip project sync if no rules were added (only skills) — avoids wasted API calls
+    if not added_rules:
+        log.info("No rules added — skipping project repo sync.")
+        log.info("=== Done ===")
+        return
 
     with ThreadPoolExecutor(max_workers=4) as executor:
         futures = {

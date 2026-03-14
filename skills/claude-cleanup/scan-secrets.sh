@@ -58,13 +58,15 @@ echo ""
 if [ "$TOTAL" -gt 0 ]; then
 	echo "Files containing secrets:"
 	echo "----------------------------------------"
-	# Use combined pattern for file listing
+	# Use combined pattern for file listing (cached to avoid duplicate recursive grep)
 	ALL="$JWT|$OPENAI|$ANTHROPIC|$GITHUB|$AWS|$STRIPE|$SLACK"
-	grep -rlE "$ALL" "$TARGET" 2>/dev/null | head -20 | while read -r file; do
+	FILE_LIST=$(grep -rlE "$ALL" "$TARGET" 2>/dev/null)
+	echo "$FILE_LIST" | head -20 | while read -r file; do
+		[ -z "$file" ] && continue
 		count=$(grep -coE "$ALL" "$file" 2>/dev/null || echo 0)
 		printf "  %-60s (%s)\n" "$file" "$count"
 	done
-	FILE_COUNT=$(grep -rlE "$ALL" "$TARGET" 2>/dev/null | wc -l | tr -d ' ')
+	FILE_COUNT=$(echo "$FILE_LIST" | grep -c . || echo 0)
 	if [ "$FILE_COUNT" -gt 20 ]; then
 		echo "  ... and $((FILE_COUNT - 20)) more files"
 	fi

@@ -30,7 +30,7 @@ if [[ ! -f ".gitignore" ]]; then
 	exit 0
 fi
 
-ISSUES=""
+ISSUES="[]"
 STATUS="ok"
 
 for pattern in "${CRITICAL_PATTERNS[@]}"; do
@@ -44,33 +44,26 @@ for pattern in "${CRITICAL_PATTERNS[@]}"; do
 	if [[ -n "$MATCHED_FILES" ]]; then
 		while IFS= read -r file; do
 			if [[ -n "$file" ]]; then
-				if [[ -n "$ISSUES" ]]; then
-					ISSUES="$ISSUES,"
-				fi
-				ISSUES="$ISSUES{\"severity\": \"critical\", \"message\": \"$file would be committed (secrets at risk)\", \"pattern\": \"$pattern\"}"
+				ISSUES=$(echo "$ISSUES" | jq --arg f "$file" --arg p "$pattern" \
+					'. + [{"severity": "critical", "message": "\($f) would be committed (secrets at risk)", "pattern": $p}]')
 				STATUS="error"
 			fi
 		done <<< "$MATCHED_FILES"
 	fi
 done
 
-for file in $STAGED_FILES; do
+while IFS= read -r file; do
+	[[ -z "$file" ]] && continue
 	if [[ -f "$file" ]]; then
 		SIZE=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null || echo "0")
 		if [[ "$SIZE" -gt 10485760 ]]; then
-			if [[ -n "$ISSUES" ]]; then
-				ISSUES="$ISSUES,"
-			fi
-			ISSUES="$ISSUES{\"severity\": \"warning\", \"message\": \"$file is larger than 10MB\", \"pattern\": null}"
+			ISSUES=$(echo "$ISSUES" | jq --arg f "$file" \
+				'. + [{"severity": "warning", "message": "\($f) is larger than 10MB", "pattern": null}]')
 			if [[ "$STATUS" == "ok" ]]; then
 				STATUS="warning"
 			fi
 		fi
 	fi
-done
+done <<< "$STAGED_FILES"
 
-if [[ -z "$ISSUES" ]]; then
-	echo '{"status": "ok", "issues": []}'
-else
-	echo "{\"status\": \"$STATUS\", \"issues\": [$ISSUES]}"
-fi
+jq -n --arg status "$STATUS" --argjson issues "$ISSUES" '{status: $status, issues: $issues}'
