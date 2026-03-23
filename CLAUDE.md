@@ -191,6 +191,7 @@ Keep instructions concise - verbose guidance wastes tokens.
 - Use tabs for indentation (not spaces)
 - Always use existing components first - check `components/ui/` before creating new UI elements
 
+- When a design uses no color (monochrome/zinc palette), new components must match — never introduce colored elements into a colorless design system.
 ### Tooling
 - **Package manager**: `pnpm` (not npm/yarn)
 - **Pre-build**: Always run `lint` + `type-check` before builds
