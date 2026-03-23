@@ -79,6 +79,15 @@ At the start of every session:
 
 ## Working Style
 
+### Build for Model Trajectory
+Don't over-scaffold AI integrations. Models improve monthly — keep wrappers thin and replaceable. Build for where models are going, not where they are.
+
+### Speed > Perfection
+Prototype in real code, iterate there. Don't spend time on elaborate mocks/wireframes when you can build and polish live.
+
+### Demand Clarity Before Building
+Ruthless specificity in prompts/specs > technical knowledge. Garbage in = garbage faster with AI. Push back on vague requirements before writing code.
+
 ### Act Confidently
 Make changes without excessive confirmation. Git provides safety - work can always be reverted with `git checkout .`
 
