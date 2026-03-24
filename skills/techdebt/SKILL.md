@@ -17,9 +17,10 @@ Run at the end of every session to find and kill technical debt.
 Scan recently changed files for quick wins:
 
 1. Get changed files: `git diff --name-only HEAD~5` or `git diff --name-only main`
-2. Run checks on those files only
-3. Fix issues automatically where safe
-4. Report what was cleaned up
+2. **Run `/simplify` first** — review changed code for over-engineering, unnecessary complexity, and YAGNI violations before doing cleanup
+3. Run checks on those files only
+4. Fix issues automatically where safe
+5. Report what was cleaned up
 
 ---
 
