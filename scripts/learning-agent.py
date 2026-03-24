@@ -245,8 +245,24 @@ def build_extraction_prompt(claude_md_content: str, session_text: str) -> str:
 
 ## Instructions
 
-Identify patterns from the session messages that represent generic, reusable lessons —
-things that should apply across many projects, not just the specific app being built.
+Identify patterns from the session messages that represent UNIVERSAL engineering lessons —
+things that apply to ANY software project regardless of stack, domain, or design choices.
+
+CRITICAL FILTER: A rule must pass this test:
+  "Would this rule make sense in a completely different project with different tech/design?"
+If the answer is no, DO NOT include it.
+
+REJECT examples (project-specific — do NOT extract these):
+- "Match monochrome palette" — specific to one project's design system
+- "Use zinc colors" — specific design choice
+- "Put API routes under /api/v2" — specific architecture decision
+- "Use Supabase RLS for multi-tenant" — specific to one project's auth model
+- "Import from @/lib/utils" — specific project structure
+
+ACCEPT examples (universal — these ARE valid):
+- "Run type-check before committing" — applies everywhere
+- "Test mobile viewport after UI changes" — applies everywhere
+- "Validate environment variables exist at startup" — applies everywhere
 
 Output learnings in EXACTLY this pipe-delimited format (one per line):
 
@@ -257,14 +273,16 @@ Where <section> must be one of:
   Working Style, Code Style, Testing Approach, Before Committing, Personal Preferences
 
 Rules:
-- Must be generic (not app-specific)
+- Must be UNIVERSALLY applicable (not project-specific, not design-specific, not stack-specific)
 - Must NOT already be present in CLAUDE.md above
 - Must be high-confidence lessons (not speculative)
 - Rule text should be a single concise imperative sentence
+- When in doubt, leave it out — err heavily toward NOTHING_NEW
 
 Skills:
 - <skill-name> is a lowercase-hyphenated command name (e.g. `db-reset`)
 - Only suggest a skill if a recurring multi-step workflow emerged from the session
+- The skill must be useful across multiple projects, not just the one being worked on
 - Summary must explain what the skill does and when to use it (2-3 sentences)
 
 If nothing qualifies, output exactly: NOTHING_NEW
