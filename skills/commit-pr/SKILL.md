@@ -79,7 +79,32 @@ Format the response as `type: description` where type is one of: `feat`, `fix`, 
 git commit -m "<type>: <description>"
 ```
 
-### 8. Push
+### 8. Check for merge conflicts with main
+
+Before pushing, check if the branch is behind main and has conflicts:
+
+```bash
+git fetch origin main
+git merge-tree $(git merge-base HEAD origin/main) HEAD origin/main 2>/dev/null | grep -c '<<<<<<<' || true
+```
+
+If there are potential conflicts, merge main into the branch:
+
+```bash
+git merge origin/main
+```
+
+If merge conflicts occur:
+1. List the conflicted files: `git diff --name-only --diff-filter=U`
+2. Read each conflicted file and resolve the conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`)
+3. Keep both sides' changes where they don't contradict, or pick the correct version
+4. Stage resolved files: `git add <file>`
+5. Run lint and type-check again to verify the resolution
+6. Commit the merge: `git commit -m "merge: resolve conflicts with main"`
+
+If no conflicts, the merge completes automatically.
+
+### 9. Push
 
 Check if upstream is set:
 
@@ -99,7 +124,7 @@ Otherwise:
 git push
 ```
 
-### 9. Create PR
+### 10. Create PR
 
 Check if a PR already exists for this branch:
 
