@@ -33,6 +33,7 @@ PROJECT_REPOS = {
     "little-language-labs": Path.home() / "Documents" / "GitHub" / "little-language-labs",
     "palette": Path.home() / "Documents" / "GitHub" / "palette",
     "jesselusa-com": Path.home() / "Documents" / "GitHub" / "jesselusa-com",
+    "arc": Path.home() / "Documents" / "GitHub" / "arc",
 }
 
 VALID_SECTIONS = [
