@@ -3,17 +3,18 @@
 Daily Learning Agent
 
 Scans recent Claude session logs, extracts learnings, updates CLAUDE.md,
-creates skill stubs, and opens PRs across the personal config repo and
-four project repos.
+creates skill stubs, and opens a PR on the personal config repo.
+
+Project repo syncing is handled by a remote Claude scheduled trigger
+(CLAUDE.md Sync — daily 10am PT).
 """
 
 import json
 import logging
 import sys
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from pathlib import Path
-import subprocess
+import subprocess  # noqa: S404
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -27,14 +28,6 @@ TODAY = datetime.now().strftime("%Y-%m-%d")
 BRANCH = f"feat/daily-learnings-{TODAY}"
 LOOKBACK_HOURS = 24
 SUBAGENTS_DIR = "subagents"
-
-PROJECT_REPOS = {
-    "pokecrm": Path.home() / "Documents" / "GitHub" / "pokecrm",
-    "little-language-labs": Path.home() / "Documents" / "GitHub" / "little-language-labs",
-    "palette": Path.home() / "Documents" / "GitHub" / "palette",
-    "jesselusa-com": Path.home() / "Documents" / "GitHub" / "jesselusa-com",
-    "arc": Path.home() / "Documents" / "GitHub" / "arc",
-}
 
 VALID_SECTIONS = [
     "Working Style",
@@ -452,116 +445,6 @@ def create_claude_repo_pr(added_rules: list[str], created_skills: list[str]) -> 
 
 
 # ---------------------------------------------------------------------------
-# Step 6: Sync to project repos
-# ---------------------------------------------------------------------------
-
-
-def build_sync_prompt(global_claude_md: str, project_claude_md: str) -> str:
-    return f"""You are comparing a global CLAUDE.md against a project-specific CLAUDE.md to find missing generic rules.
-
-## Global CLAUDE.md (source of new rules)
-
-{global_claude_md}
-
-## Project CLAUDE.md (target — DO NOT rewrite this)
-
-{project_claude_md}
-
-## Instructions
-
-Identify any generic rules in the global CLAUDE.md that are NOT yet present in the
-project CLAUDE.md and that would be applicable to a typical software project.
-
-Do NOT include rules that are clearly specific to the global config repo itself
-(e.g. "creating skills", "syncing repositories", "multi-repo awareness", etc.).
-
-Output ONLY in this pipe-delimited format (one per line):
-
-  RULE|<section header from the PROJECT file>|<rule text>
-
-Where <section header> must EXACTLY match an existing ## or ### heading in the project
-CLAUDE.md above. Use the project's section names, not the global file's.
-
-Rules:
-- Rule text should be a single concise line (imperative sentence or "**Bold label** — description")
-- Must NOT already be present in the project CLAUDE.md
-- Must be generic (applicable to any project, not config-repo-specific)
-
-If nothing qualifies, output exactly: NO_CHANGES
-
-Do not include any explanation, preamble, or commentary — only the output lines."""
-
-
-def parse_sync_rules(raw: str) -> list[dict]:
-    """Parse RULE|section|text lines from Claude sync output."""
-    rules: list[dict] = []
-    for line in raw.splitlines():
-        line = line.strip()
-        if not line:
-            continue
-        parts = line.split("|")
-        if parts[0] == "RULE" and len(parts) >= 3:
-            section, rule = parts[1].strip(), parts[2].strip()
-            if section and rule:
-                rules.append({"section": section, "rule": rule})
-    return rules
-
-
-def sync_project_repo(
-    repo_name: str, repo_path: Path, global_claude_md: str, claude_repo_pr_url: str | None
-) -> None:
-    """Sync global CLAUDE.md learnings to a project repo and open a PR."""
-    log.info("Syncing %s...", repo_name)
-
-    if not repo_path.exists():
-        log.warning("Repo path does not exist: %s — skipping", repo_path)
-        return
-
-    project_claude_md_path = repo_path / CLAUDE_MD_FILE
-    if not project_claude_md_path.exists():
-        log.warning("No CLAUDE.md found in %s — skipping", repo_path)
-        return
-
-    original_content = project_claude_md_path.read_text(encoding="utf-8")
-    raw_output = run_claude(build_sync_prompt(global_claude_md, original_content))
-
-    if raw_output is None or "NO_CHANGES" in raw_output:
-        log.info("No changes for %s — skipping PR", repo_name)
-        return
-
-    rules = parse_sync_rules(raw_output)
-    if not rules:
-        log.info("No valid RULE lines parsed for %s — skipping PR", repo_name)
-        return
-
-    updated_content, added = insert_rules(
-        original_content, rules, header_prefixes=("## ", "### "),
-    )
-
-    if not added:
-        log.info("All rules already present in %s — skipping PR", repo_name)
-        return
-
-    project_claude_md_path.write_text(updated_content, encoding="utf-8")
-
-    rules_md = "\n".join(f"- {r}" for r in added)
-    ref_line = f"\nSee source PR: {claude_repo_pr_url}" if claude_repo_pr_url else ""
-    pr_url = commit_and_open_pr(
-        repo_path,
-        [CLAUDE_MD_FILE],
-        f"feat: sync CLAUDE.md learnings {TODAY}",
-        f"feat: sync CLAUDE.md learnings {TODAY}",
-        f"## Sync CLAUDE.md — {TODAY}\n\nAutomated PR to sync generic engineering rules "
-        f"from the global `jesselusa/claude` config.{ref_line}\n\n"
-        f"### Rules added\n\n{rules_md}\n\n---\nGenerated by `scripts/learning-agent.py`",
-    )
-
-    if pr_url is None:
-        # Restore if nothing was committed (e.g. branch already existed)
-        project_claude_md_path.write_text(original_content, encoding="utf-8")
-
-
-# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -595,29 +478,12 @@ def main() -> None:
         log.info("Learnings parsed but nothing new to apply. Exiting.")
         sys.exit(0)
 
-    claude_repo_pr_url = None
     try:
-        claude_repo_pr_url = create_claude_repo_pr(added_rules, created_skills)
+        create_claude_repo_pr(added_rules, created_skills)
     except Exception as exc:
         log.error("Failed to create PR for claude repo: %s", exc)
 
-    # Skip project sync if no rules were added (only skills) — avoids wasted API calls
-    if not added_rules:
-        log.info("No rules added — skipping project repo sync.")
-        log.info("=== Done ===")
-        return
-
-    with ThreadPoolExecutor(max_workers=4) as executor:
-        futures = {
-            executor.submit(sync_project_repo, name, path, updated_claude_md, claude_repo_pr_url): name
-            for name, path in PROJECT_REPOS.items()
-        }
-        for future in as_completed(futures):
-            try:
-                future.result()
-            except Exception as exc:
-                log.error("Failed to sync %s: %s", futures[future], exc)
-
+    # Project repo syncing is handled by the remote CLAUDE.md Sync trigger (daily 10am PT)
     log.info("=== Done ===")
 
 
