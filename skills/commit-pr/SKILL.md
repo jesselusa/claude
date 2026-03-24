@@ -60,6 +60,24 @@ If this fails, report the errors and **stop**.
 
 If `pnpm type-check` is not available, try `tsc --noEmit`. If neither works, skip and note it.
 
+### 5b. Run tests
+
+Check if a test script exists:
+
+```bash
+grep -q '"test"' package.json && echo "has-tests" || echo "no-tests"
+```
+
+If a test script exists, run it:
+
+```bash
+pnpm test
+```
+
+If tests fail, report the failures and **stop**. Do not commit with failing tests.
+
+If no test script exists, skip and note it.
+
 ### 6. Stage changes
 
 ```bash
@@ -146,6 +164,7 @@ gh pr create \
 ## Test plan
 - [ ] Lint passes
 - [ ] Type-check passes
+- [ ] Tests pass
 - [ ] Tested locally
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
