@@ -12,7 +12,7 @@ Check open Dependabot alerts across all personal repos and auto-patch what's fix
 - jesselusa/pokecrm
 - jesselusa/little-language-labs
 - jesselusa/palette
-- jesselusa/jesselusa-com
+- jesselusa/jesselusa.com
 
 ---
 
@@ -23,7 +23,7 @@ Check open Dependabot alerts across all personal repos and auto-patch what's fix
 Fetch open Dependabot alerts for each repo:
 
 ```bash
-for repo in pokecrm little-language-labs palette jesselusa-com; do
+for repo in pokecrm little-language-labs palette jesselusa.com; do
   echo "=== jesselusa/$repo ==="
   gh api repos/jesselusa/$repo/dependabot/alerts \
     --jq '[.[] | select(.state=="open")] | map({package: .security_vulnerability.package.name, severity: .security_advisory.severity, summary: .security_advisory.summary, fixedIn: .security_vulnerability.first_patched_version.identifier}) | .[]'
@@ -136,12 +136,12 @@ Security Patch Report
 Alerts Found:
   pokecrm       lodash   HIGH      → Patched
   palette       axios    MODERATE  → Patched
-  jesselusa-com next     HIGH      → Needs manual intervention (major bump)
+  jesselusa.com next     HIGH      → Needs manual intervention (major bump)
 
 PRs Created:
   https://github.com/jesselusa/pokecrm/pull/...
   https://github.com/jesselusa/palette/pull/...
 
 Needs Manual Intervention:
-  jesselusa/jesselusa-com — next requires major version bump. Review changelog before upgrading.
+  jesselusa/jesselusa.com — next requires major version bump. Review changelog before upgrading.
 ```
