@@ -106,7 +106,7 @@ Never commit directly to main. If already on main when asked to commit, create a
 Before signing off, always run `/techdebt` → `/learn` → `/git-cleanup` in that order. Proactively offer this at the end of every session.
 
 ### Multi-Repo Awareness
-When cleaning up branches, default to checking all 4 repos: pokecrm, little-language-labs, palette, jesselusa.com — unless a specific repo is specified.
+When cleaning up branches, default to checking all 5 repos: pokecrm, little-language-labs, palette, jesselusa.com, arc — unless a specific repo is specified.
 
 ### Proactively Share Session Learnings
 At the end of every session, volunteer what you learned and ask if it should go into CLAUDE.md before the user has to ask.
