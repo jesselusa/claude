@@ -65,6 +65,8 @@ cp templates/nextjs.md /path/to/project/CLAUDE.md
 | `/session-end` | End-of-session wrapper: runs /techdebt → /learn → /git-cleanup in sequence |
 | `/setup-integration` | Scaffold third-party service setup (Stripe, Notion, Twilio, Cloudinary, Supabase) |
 | `/security-patch` | Check dependabot alerts across all repos, auto-patch, create PRs |
+| `/sync-claude-md` | Sync universal rules from global CLAUDE.md to all project repos, create PRs |
+| `/eval-sync` | Score past sync decisions against PR outcomes, surface patterns, improve filters |
 
 ---
 
