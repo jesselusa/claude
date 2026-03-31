@@ -193,6 +193,7 @@ Keep instructions concise - verbose guidance wastes tokens.
 - Use tabs for indentation (not spaces)
 - Always use existing components first - check `components/ui/` before creating new UI elements
 
+- Reuse a single shared component for repeated UI patterns (close buttons, modals, icons) across all screens — never create one-off variants.
 ### Tooling
 - **Package manager**: `pnpm` (not npm/yarn)
 - **Pre-build**: Always run `lint` + `type-check` before builds
@@ -221,32 +222,64 @@ Keep instructions concise - verbose guidance wastes tokens.
 
 ## Frontend Design
 
-Avoid generic "AI slop" aesthetics. Make distinctive frontends that surprise and delight.
+Avoid generic "AI slop" aesthetics. Make distinctive frontends that surprise and delight. Root design in actual user needs, not surface-level aesthetics.
+
+### Design System First
+Before building UI, generate a tailored design system for the project:
+- Define pattern (hero-centric, dashboard, editorial, etc.) based on product type
+- Pick a cohesive style (soft UI, brutalist, minimalist, etc.) matched to the brand
+- Set colors with clear roles: primary, secondary, CTA, background, text
+- Choose font pairing with mood alignment (elegant, technical, playful, etc.)
+- Define key effects (shadows, transitions, hover states)
+- List anti-patterns to avoid for this specific project
 
 ### Typography
 - Choose beautiful, unique fonts - avoid Inter, Roboto, Arial, system fonts
 - Distinctive choices elevate the whole design
+- Pair fonts intentionally (display + body) with mood alignment
 
 ### Color & Theme
 - Commit to a cohesive aesthetic, use CSS variables
 - Dominant colors with sharp accents > timid, evenly-distributed palettes
 - Draw from IDE themes and cultural aesthetics for inspiration
 - Vary between light/dark themes - don't default to the same thing every time
+- Ensure light mode text contrast 4.5:1 minimum (WCAG AA)
 
 ### Motion
 - Use animations for effects and micro-interactions
 - Prioritize CSS-only solutions for HTML, Motion library for React
 - One well-orchestrated page load with staggered reveals > scattered micro-interactions
+- Smooth transitions (150-300ms) on all interactive elements
+- Respect `prefers-reduced-motion` always
 
 ### Backgrounds
 - Create atmosphere and depth, not solid colors
 - Layer CSS gradients, geometric patterns, contextual effects
 
+### Pre-Delivery Checklist
+Before shipping any UI:
+- [ ] No emojis as icons (use SVG: Heroicons/Lucide)
+- [ ] `cursor-pointer` on all clickable elements
+- [ ] Hover states with smooth transitions (150-300ms)
+- [ ] Focus states visible for keyboard navigation
+- [ ] `prefers-reduced-motion` respected
+- [ ] Responsive: 375px, 768px, 1024px, 1440px tested
+
 ### Avoid
 - Overused fonts (Inter, Roboto, Space Grotesk, Arial)
-- Clichéd color schemes (purple gradients on white)
+- Clichéd color schemes (purple gradients on white, "AI purple/pink gradients")
 - Predictable layouts and cookie-cutter patterns
 - Safe, generic choices - think outside the box
+- Emojis as functional icons
+- Harsh/jarring animations
+
+### Installed Design Skills
+These auto-trigger on frontend tasks — no manual invocation needed:
+- **ui-ux-pro-max** — UX strategy + design system generator (161 product types, 84 styles)
+- **taste-skill** (7 sub-skills) — premium design quality, brutalist/minimalist styles, full output enforcement
+- **ui-animation** — motion/animation guidelines (CSS, framer-motion, springs)
+- **web-design-guidelines** — 100+ web design principles from Vercel team
+- **frontend-design** / **shadcn** — already installed via plugins
 
 ### Social Sharing & Metadata (Next.js)
 
