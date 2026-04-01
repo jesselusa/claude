@@ -195,6 +195,10 @@ Keep instructions concise - verbose guidance wastes tokens.
 - Always use existing components first - check `components/ui/` before creating new UI elements
 
 - Reuse a single shared component for repeated UI patterns (close buttons, modals, icons) across all screens — never create one-off variants.
+
+- Before creating new UI components or patterns, search for and reuse existing shared components in the project first
+
+- When introducing a new reusable pattern not already in the project's shared components, add it back to the shared layer after implementation
 ### Tooling
 - **Package manager**: `pnpm` (not npm/yarn)
 - **Pre-build**: Always run `lint` + `type-check` before builds
