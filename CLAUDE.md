@@ -137,7 +137,8 @@ After every change:
    - API/structure → update README
    - Patterns/preferences → update CLAUDE.md
 5. **Teach Claude** - review the session for lessons learned (mistakes, improvements, patterns). Ask the user if they want them added to CLAUDE.md
-6. **Commit to feature branch** - always commit to a feature branch, then create a PR to merge
+6. **Check PR/branch status** - before creating or updating a PR, run `gh pr list --head <branch>` to check if a PR already exists and whether it's been merged. Don't create duplicate PRs or push to merged branches.
+7. **Commit to feature branch** - always commit to a feature branch, then create a PR to merge
 
 ---
 
