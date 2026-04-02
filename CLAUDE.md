@@ -67,6 +67,7 @@ cp templates/nextjs.md /path/to/project/CLAUDE.md
 | `/security-patch` | Check dependabot alerts across all repos, auto-patch, create PRs |
 | `/sync-claude-md` | Sync universal rules from global CLAUDE.md to all project repos, create PRs |
 | `/eval-sync` | Score past sync decisions against PR outcomes, surface patterns, improve filters |
+| `/remind-me` | Show what's been built, what's left, and what to work on next |
 
 ---
 
