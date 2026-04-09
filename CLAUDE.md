@@ -200,6 +200,10 @@ Keep instructions concise - verbose guidance wastes tokens.
 - Before creating new UI components or patterns, search for and reuse existing shared components in the project first
 
 - When introducing a new reusable pattern not already in the project's shared components, add it back to the shared layer after implementation
+
+- Provide immediate visual feedback after user actions — update or remove stale UI elements instantly without waiting for background processes
+
+- Maintain consistent UI patterns across similar component types (drawers, modals, detail panels) within the same application
 ### Tooling
 - **Package manager**: `pnpm` (not npm/yarn)
 - **Pre-build**: Always run `lint` + `type-check` before builds
