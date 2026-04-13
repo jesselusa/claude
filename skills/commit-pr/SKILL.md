@@ -1,28 +1,29 @@
 ---
 name: commit-pr
-description: Lint, type-check, commit all changes, push, and open a PR on a feature branch
+description: Commit all changes and open a PR on a feature branch (global hooks handle branch, .env, lint, and type-check enforcement)
 disable-model-invocation: true
 ---
 
 # Commit & PR
 
-The standard end-of-task workflow: verify, commit, push, and open a pull request.
+End-of-task workflow: commit, push, and open a PR. Global hooks enforce the safety rails, so this skill focuses on intent (message, PR body).
+
+**Hooks in play (automatic, don't duplicate):**
+- `git commit` on main → blocked
+- `git add .env*` (non-example) → blocked
+- Pre-commit: `pnpm lint` + `pnpm type-check` run automatically (if scripts exist)
 
 ---
 
 ## Steps
 
-### 1. Check branch
+### 1. If on main, create a feature branch
+
+If the blocker hook fires on commit, you'll know you're on main. Front-run it: check branch first, and if on `main`/`master`, use `AskUserQuestion` to ask for a branch name, then:
 
 ```bash
-git branch --show-current
+git checkout -b <branch-name>
 ```
-
-If on `main` or `master`:
-- Use `AskUserQuestion` to ask for a feature branch name
-- Create and switch to it: `git checkout -b <branch-name>`
-
-If already on a feature branch, continue.
 
 ### 2. Check for changes
 
@@ -30,147 +31,71 @@ If already on a feature branch, continue.
 git status --short
 ```
 
-If nothing to commit, output "Nothing to commit." and exit.
+Nothing staged or modified → "Nothing to commit." and exit.
 
-### 3. Warn about sensitive files
+### 3. Run tests (if present)
 
-```bash
-git status --short | grep -E '\.env'
-```
-
-If any `.env` files are staged or modified, warn the user and ask before proceeding. Never commit `.env` files.
-
-### 4. Lint
+Lint + type-check run automatically at commit time via hooks. Tests don't — run them here if the project has them:
 
 ```bash
-pnpm lint
+grep -q '"test"' package.json 2>/dev/null && pnpm test
 ```
 
-If this fails, report the errors and **stop**. Do not commit broken code.
+If tests fail, stop. Don't proceed to commit.
 
-If `pnpm lint` is not available, try `pnpm run lint`. If no lint script exists, skip and note it.
+### 4. Commit message
 
-### 5. Type-check
+Use `AskUserQuestion`:
+> "Describe what this commit does (I'll format it as a conventional commit):"
 
-```bash
-pnpm type-check
-```
-
-If this fails, report the errors and **stop**.
-
-If `pnpm type-check` is not available, try `tsc --noEmit`. If neither works, skip and note it.
-
-### 5b. Run tests
-
-Check if a test script exists:
-
-```bash
-grep -q '"test"' package.json && echo "has-tests" || echo "no-tests"
-```
-
-If a test script exists, run it:
-
-```bash
-pnpm test
-```
-
-If tests fail, report the failures and **stop**. Do not commit with failing tests.
-
-If no test script exists, skip and note it.
-
-### 6. Stage changes
+Format as `type: description` — types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`.
 
 ```bash
 git add -A
-```
-
-Exclude any `.env*` files from staging.
-
-### 7. Commit message
-
-Use `AskUserQuestion` to ask:
-> "Describe what this commit does (I'll format it as a conventional commit):"
-
-Format the response as `type: description` where type is one of: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`.
-
-```bash
 git commit -m "<type>: <description>"
 ```
 
-### 8. Check for merge conflicts with main
+If the commit is blocked by hooks (lint/type-check failure, .env staged), surface the hook message to the user and stop. Don't bypass with `--no-verify`.
 
-Before pushing, check if the branch is behind main and has conflicts:
+### 5. Rebase/merge main if needed
 
 ```bash
 git fetch origin main
 git merge-tree $(git merge-base HEAD origin/main) HEAD origin/main 2>/dev/null | grep -c '<<<<<<<' || true
 ```
 
-If there are potential conflicts, merge main into the branch:
+If conflicts, `git merge origin/main`, resolve, `git add`, `git commit -m "merge: resolve conflicts with main"`.
+
+### 6. Push
 
 ```bash
-git merge origin/main
+git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null \
+  && git push \
+  || git push -u origin "$(git branch --show-current)"
 ```
 
-If merge conflicts occur:
-1. List the conflicted files: `git diff --name-only --diff-filter=U`
-2. Read each conflicted file and resolve the conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`)
-3. Keep both sides' changes where they don't contradict, or pick the correct version
-4. Stage resolved files: `git add <file>`
-5. Run lint and type-check again to verify the resolution
-6. Commit the merge: `git commit -m "merge: resolve conflicts with main"`
-
-If no conflicts, the merge completes automatically.
-
-### 9. Push
-
-Check if upstream is set:
-
-```bash
-git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null
-```
-
-If no upstream (first push on this branch):
-
-```bash
-git push -u origin <branch-name>
-```
-
-Otherwise:
-
-```bash
-git push
-```
-
-### 10. Create PR
-
-Check if a PR already exists for this branch:
+### 7. Create PR (if not already one)
 
 ```bash
 gh pr view --json url -q .url 2>/dev/null
 ```
 
-If a PR already exists, output its URL and exit.
-
-Otherwise:
+Exists → print URL, exit. Otherwise:
 
 ```bash
 gh pr create \
   --title "<commit message>" \
+  --assignee @me \
   --body "$(cat <<'EOF'
 ## Summary
 <brief description of changes>
 
 ## Test plan
-- [ ] Lint passes
-- [ ] Type-check passes
-- [ ] Tests pass
 - [ ] Tested locally
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
-)" \
-  --assignee @me
+)"
 ```
 
-Output the PR URL when done.
+Output the PR URL.

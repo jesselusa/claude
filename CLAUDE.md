@@ -68,6 +68,7 @@ cp templates/nextjs.md /path/to/project/CLAUDE.md
 | `/sync-claude-md` | Sync universal rules from global CLAUDE.md to all project repos, create PRs |
 | `/eval-sync` | Score past sync decisions against PR outcomes, surface patterns, improve filters |
 | `/remind-me` | Show what's been built, what's left, and what to work on next |
+| `/design-inspo` | Pick 2–3 design systems as taste references before building UI (inspo only, not copying) |
 
 ---
 
@@ -130,10 +131,30 @@ After every change:
 
 ---
 
+## Model Routing (subagents)
+
+Main session stays on Opus — that's where reasoning and taste calls happen. When spawning subagents via the Agent tool, **always pass an explicit `model` param** based on work type:
+
+- **`model: "sonnet"`** — execution, search, mechanical work. Use for: `Explore` (codebase search), `pr-comment-resolver`, `bug-reproduction-validator`, `framework-docs-researcher`, `git-history-analyzer`, `repo-research-analyst`, most research/lookup agents, file searches, bulk refactors, test runs.
+- **`model: "opus"`** — reasoning, planning, review. Use for: `Plan`, `architecture-strategist`, `kieran-*-reviewer`, `dhh-rails-reviewer`, `spec-flow-analyzer`, `performance-oracle`, `security-sentinel`, `data-integrity-guardian`, any agent making judgment calls about correctness or design.
+- **Never `haiku`** for code work.
+
+Rule of thumb: if the agent is *finding/doing*, use Sonnet. If it's *deciding/reviewing*, use Opus. When unsure, default to Sonnet — cost savings compound, and you can re-run with Opus if the result is weak.
+
+## Automated by Hooks (don't duplicate)
+
+Global hooks in `~/.claude/settings.json` already enforce:
+- Block `rm -rf`, destructive DB commands, `npm`/`yarn install`, `git add .env*`, `git commit` on main, `git push --force` to main
+- Pre-commit: `pnpm lint` + `pnpm type-check` run automatically in pnpm projects
+- Skills re-symlink automatically after editing `skills/*`
+- SessionStart: branch/task/merged-branch warnings
+
+Don't manually run lint or type-check before commit — the hook does it. If a hook blocks you, surface the message and fix the underlying issue; don't bypass with `--no-verify`.
+
 ## Before Committing
 
 1. **Clean** - run `/techdebt` to remove dead code, debug statements, duplicates
-2. **Verify** - tests, lint, type-check pass
+2. **Verify** - tests pass (lint + type-check are handled by the pre-commit hook)
 3. **Update tasks** - mark completed `[x]` in `tasks/`, add new tasks discovered
 4. **Update docs** if you changed:
    - Data model → update schema docs or comments
