@@ -87,6 +87,8 @@ TypeScript/JavaScript + Python · Next.js (App Router) · Tailwind + ShadCN · S
 - Check `components/ui/` before creating new components
 - Reuse a single shared component for repeated UI patterns (close buttons, modals, icons) — never one-off variants
 - When introducing a new reusable pattern, promote it to the shared layer after implementation
+- Provide immediate visual feedback after user actions — update or remove stale UI elements instantly, don't wait for background work
+- Maintain consistent UI patterns across similar component types (drawers, modals, detail panels) within the same app
 
 ### Tooling
 - Package manager: **pnpm** (not npm/yarn)
