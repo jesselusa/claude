@@ -10,10 +10,11 @@ Sync universal engineering rules from `jesselusa/claude` to all target repos. Af
 ## Target Repos
 
 1. `jesselusa/arc`
-2. `jesselusa/little-language-labs`
-3. `jesselusa/pokecrm`
-4. `jesselusa/palette`
-5. `jesselusa/jesselusa.com`
+2. `jesselusa/arc-ios`
+3. `jesselusa/little-language-labs`
+4. `jesselusa/pokecrm`
+5. `jesselusa/palette`
+6. `jesselusa/jesselusa.com`
 
 ## Workflow
 
