@@ -49,6 +49,10 @@ Custom slash commands available after installation:
 | `/session-end` | End-of-session wrapper: runs /techdebt → /learn → /git-cleanup in sequence |
 | `/setup-integration` | Scaffold third-party service setup (Stripe, Notion, Twilio, Cloudinary, Supabase) |
 | `/security-patch` | Check dependabot alerts across all repos, auto-patch, create PRs |
+| `/sync-claude-md` | Sync universal rules from global CLAUDE.md to all project repos, create PRs |
+| `/eval-sync` | Score past sync decisions against PR outcomes, surface patterns, improve filters |
+| `/remind-me` | Show what's been built, what's left, and what to work on next |
+| `/design-inspo` | Pick 2–3 design systems as taste references before building UI (inspo only, not copying) |
 
 Based on [dcnu/claude](https://github.com/dcnu/claude).
 
