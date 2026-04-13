@@ -13,6 +13,7 @@ Wired into `~/.claude/settings.json`. Source scripts live in `hooks/scripts/`.
 | `resymlink-skills.sh` | PostToolUse / Edit\|Write\|MultiEdit | After editing anything in `~/Documents/GitHub/claude/skills/`, re-runs the skills symlink loop so new skills appear immediately. |
 | `session-start.sh` | SessionStart | Prints branch, warns on uncommitted-changes-on-main, counts task files in `tasks/`, counts merged local branches, checks README + .gitignore exist. |
 | `require-agent-model.sh` | PreToolUse / Agent | Blocks subagent calls that don't pass an explicit `model` param, so model routing (CLAUDE.md) is enforced. Also blocks `haiku` for code work. |
+| `doc-drift-check.sh` | PreToolUse / Bash | Non-blocking. On `git commit` inside the claude repo, warns if the staged diff adds a new skill, hook script, or template without staging the corresponding doc update (README.md, CLAUDE.md, hooks/README.md). Claude asks the user before proceeding. |
 
 ### What's intentionally NOT hooked
 
