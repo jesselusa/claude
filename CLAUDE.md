@@ -90,6 +90,7 @@ TypeScript/JavaScript + Python · Next.js (App Router) · Tailwind + ShadCN · S
 - Provide immediate visual feedback after user actions — update or remove stale UI elements instantly, don't wait for background work
 - Maintain consistent UI patterns across similar component types (drawers, modals, detail panels) within the same app
 
+- Persist user-entered form data locally so it survives failed API calls and retries — never require the user to retype input after a failure.
 ### Tooling
 - Package manager: **pnpm** (not npm/yarn)
 - Commit format: `type: description` — `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
