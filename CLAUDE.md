@@ -91,6 +91,10 @@ TypeScript/JavaScript + Python · Next.js (App Router) · Tailwind + ShadCN · S
 - Maintain consistent UI patterns across similar component types (drawers, modals, detail panels) within the same app
 
 - Persist user-entered form data locally so it survives failed API calls and retries — never require the user to retype input after a failure.
+
+- Validate ID formats (UUID, etc.) at API boundaries before database queries to fail fast with clear errors instead of opaque database type errors.
+
+- Gate premium/paid features by checking the user's current entitlement state, not just the feature flag — already-entitled users should never see upgrade prompts.
 ### Tooling
 - Package manager: **pnpm** (not npm/yarn)
 - Commit format: `type: description` — `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
