@@ -23,11 +23,14 @@ Three phases: PHASE 1 (sync), PHASE 2 (score recent outcomes), PHASE 3 (Sunday w
 ### Workflow
 
 1. Read the global CLAUDE.md from `jesselusa/claude`
-2. For each target repo:
+2. **Build per-repo rule context** from `evals/claude-md-sync/decisions.jsonl`:
+   - `closed_rules[repo]` = rules from entries with `outcome == "closed"` for that repo
+   - `open_rules[repo]` = rules from entries with `outcome == null` for that repo (PR still awaiting review — use the most recent scoring data; it is refreshed in Phase 2 after each run)
+3. For each target repo:
    a. Read that repo's CLAUDE.md
    b. Check whether branch `feat/daily-learnings-YYYY-MM-DD` already exists — if so, skip this repo
    c. Identify rules in the global CLAUDE.md not present in the project's CLAUDE.md
-   d. Apply the CRITICAL FILTER (see below)
+   d. Apply the CRITICAL FILTER (see below), using `closed_rules[repo]` and `open_rules[repo]`
    e. For each rule that passes the filter, record your self-assessment (see Logging below)
    f. Insert qualifying rules under the matching section header. Match by semantic meaning. If no matching section exists, skip the rule.
    g. If any rules were added:
@@ -49,6 +52,8 @@ Only sync rules that pass ALL of the following:
 - The rule adds a single bullet to an already-detailed existing subsection — individual items appended to a list that already covers the concept don't justify a PR
 - The rule is a design aesthetic opinion (color inspiration sources, typography personality, visual style guidance) and the target repo has a locked or well-defined design system (e.g., Arc's monochrome token system, PokeCRM's Pokemon themes)
 - No matching section exists in the target repo's CLAUDE.md
+- **Awaiting review (hard skip):** the rule semantically matches an entry in `open_rules[repo]` — there's an unmerged PR containing it, don't duplicate
+- **Previously closed (soft warning):** the rule semantically matches an entry in `closed_rules[repo]` — the user rejected it before. Only include if your new phrasing is meaningfully distinct (different scope, different concern, or clearly improved framing); otherwise drop it
 
 **PREFER rules that are:**
 - Direct behavioral instructions for Claude (how to ask questions, confirmation patterns, session habits, tool usage) — these are highest value regardless of size
