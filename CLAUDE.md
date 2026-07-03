@@ -26,6 +26,7 @@ At the start of every session:
 - **End-of-session** — always run `/techdebt` → `/learn` → `/git-cleanup` in that order
 - **Multi-repo awareness** — when cleaning branches, default to checking all 6: `arc`, `arc-ios`, `pokecrm`, `little-language-labs`, `palette`, `jesselusa.com`
 - **Proactively share learnings** — at session end, volunteer what you learned and ask if it should go in CLAUDE.md
+- **Verify adoption with data** — after shipping a feature, confirm it's actually being used with real usage data; don't treat "shipped" as "used"
 
 ---
 
