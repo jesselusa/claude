@@ -28,3 +28,10 @@ __pycache__/
 
 # Task files (local working notes, not committed)
 workflows/tasks/
+
+# Local session state (settings.local.json is already covered above)
+.claude/
+
+# Design-iteration screenshots. Scratch output from UI sessions, not reference
+# material. They were sitting loose in the repo root at ~3MB.
+*.png

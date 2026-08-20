@@ -62,6 +62,7 @@ Custom slash commands available after installation:
 | `/cleanup` | Rename files to `Source-Title-date.ext` convention |
 | `/create-new-project` | Scaffold new project with templates, optional PRD, optional GitHub repo |
 | `/create-readme` | Generate README.md and LICENSE |
+| `/critic` | Iterate a draft against `voice-dna.md` via a sub-agent loop until it reads like you |
 | `/gitignore` | Generate .gitignore by project type |
 | `/git-cleanup` | Delete branches whose PRs are merged (by PR state, not `--merged`) and prune abandoned worktrees |
 | `/kill-ports` | Find and kill processes on TCP ports |
