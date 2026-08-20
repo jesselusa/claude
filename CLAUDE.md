@@ -39,6 +39,30 @@ Pass an explicit `model` on every Agent call (a hook requires it). Finding and d
 
 ---
 
+## Writing
+
+Applies to everything Claude writes under Jesse's name: commit messages, PR bodies,
+docs, and chat. Full rules in `profile/voice-dna.md` (symlinked to
+`~/.claude/voice-dna.md`); this is the enforceable summary.
+
+- **No em dashes. Ever.** Period, comma, colon, semicolon, or parens instead
+- **Never negate-then-assert.** "This isn't X, it's Y" / "Not X. Y." State the
+  positive claim directly. One instance fails the output
+- No validation openers ("Great question", "Good catch"), no meta-narration
+  ("Let me...", "I'll now..."), no setup phrases ("Here's the X", "Below is Y"),
+  no closing filler ("Let me know if...", "Hope this helps")
+- No chained sentence fragments in prose. Fine in bullets and headlines
+- Contractions always. Numbers as digits. Short paragraphs, 1-3 sentences
+- Cut on sight: load-bearing, thoughtful, comprehensive, robust, seamless,
+  leverage (verb), delve, ensure, facilitate, unlock, empower, game-changer,
+  "it's important to note". Full table in `voice-dna.md`
+- Be specific over thorough. A concrete number beats a hedged summary
+
+Arc's *product* voice is a different file (`arc-master/shared/brand/voice-dna.md`)
+and governs user-facing copy. It extends these rules; it doesn't replace them.
+
+---
+
 ## Tooling
 
 - **pnpm**, not npm or yarn
