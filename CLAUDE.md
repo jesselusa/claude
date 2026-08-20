@@ -1,147 +1,142 @@
 # CLAUDE.md
 
-Instructions Claude follows. Every section must pass the test: **"Can Claude act on this?"**
-Structure, install commands, skill tables, and workflow tips belong in README.md, not here.
+Rules Claude follows. Every line must pass two tests: **can Claude act on it**, and
+**would Claude do something different without it**. Anything a current model already
+does by default is noise: it costs context and dilutes the rules that matter.
+
+Structure, install commands, and skill tables belong in README.md.
 
 ---
 
-## Before You Work
+## Session
 
-At the start of every session:
-1. `git pull`
-2. `/git-cleanup` to prune branches from merged PRs
-3. Check `tasks/` for outstanding work
-
----
-
-## Working Style
-
-- **Build for model trajectory** — keep AI wrappers thin; models improve monthly
-- **Speed > perfection** — prototype in real code; no elaborate mocks
-- **Demand clarity before building** — push back on vague requirements; specificity > knowledge
-- **Act confidently** — git provides safety; changes can be reverted
-- **Parallel work** — independent tasks = parallel agents. Create shared infra first, parallelize second, consolidate after
-- **Stay focused** — one concern per task; fresh context for unrelated work
-- **Always use feature branches** — if on main when asked to commit, ask for a branch name first
-- **End-of-session** — always run `/techdebt` → `/learn` → `/git-cleanup` in that order
-- **Multi-repo awareness** — when cleaning branches, default to checking all 6: `arc`, `arc-ios`, `pokecrm`, `little-language-labs`, `palette`, `jesselusa.com`
-- **Proactively share learnings** — at session end, volunteer what you learned and ask if it should go in CLAUDE.md
-- **Verify adoption with data** — after shipping a feature, confirm it's actually being used with real usage data; don't treat "shipped" as "used"
+- `git pull`, then `/git-cleanup` if the session-start hook reports stale branches
+- Check `tasks/` for outstanding work
+- **Feature branches always.** On main when asked to commit, ask for a branch name first
+- Run `/techdebt` before committing. Run `/learn` only if the session produced an actual
+  rule: a mistake a rule would have caught, or a correction from Jesse about how to work
 
 ---
 
-## Model Routing (subagents)
-
-Main session stays on Opus. When spawning subagents via the Agent tool, **always pass an explicit `model` param**:
-
-- **`sonnet`** — execution, search, mechanical work. `Explore`, `pr-comment-resolver`, `bug-reproduction-validator`, `framework-docs-researcher`, `git-history-analyzer`, most research agents, bulk refactors.
-- **`opus`** — reasoning, planning, review. `Plan`, `architecture-strategist`, `kieran-*-reviewer`, `dhh-rails-reviewer`, `spec-flow-analyzer`, `performance-oracle`, `security-sentinel`.
-- **Never `haiku`** for code work.
-
-Finding/doing → sonnet. Deciding/reviewing → opus. When unsure, default to sonnet.
-
----
-
-## Automated by Hooks (don't duplicate)
+## Automated by hooks (don't duplicate)
 
 Global hooks in `~/.claude/settings.json` already enforce:
-- Block `rm -rf`, destructive DB, `npm`/`yarn install`, `git add .env*`, commits on main, force-push to main
+- Block `rm -rf`, destructive DB, `npm`/`yarn install`, `git add .env*`, commits on main,
+  force-push to main
 - Pre-commit `pnpm lint` + `pnpm type-check` in pnpm projects
 - Require explicit `model` param on Agent calls
-- Auto-resymlink skills after editing `skills/*`
-- SessionStart: branch, task, merged-branch warnings
-- Doc-drift: warn on `git commit` in this repo if new skill/hook/template is staged without the corresponding doc update
+- SessionStart: branch, task, and merged-branch warnings
 
-Don't manually run lint/type-check before commit — the hook does it. If a hook blocks you, surface the message and fix the underlying issue; never bypass with `--no-verify`.
-
----
-
-## Testing Approach
-
-- Write tests **after** implementation, not before (no TDD)
-- After every change: tests + lint + type-check
-- For UI: verify in browser + mobile, confirm no console errors
-- Don't declare done until verification passes
+Don't run lint/type-check manually before commit. If a hook blocks you, surface the
+message and fix the cause; never `--no-verify`.
 
 ---
 
-## Before Committing
+## Subagents
 
-1. `/techdebt` — remove dead code, debug statements, duplicates
-2. Run tests (lint + type-check handled by hook)
-3. Update `tasks/` — mark `[x]`, add new discovered
-4. Update docs if you changed: data model, API/structure, or patterns/preferences
-5. `gh pr list --head <branch>` before creating a PR — don't duplicate or push to merged branches
-6. Commit to feature branch → create PR with `--assignee @me`
+Pass an explicit `model` on every Agent call (a hook requires it). Finding and doing goes to
+`sonnet`. Deciding and reviewing goes to `opus`. Never `haiku` for code work.
 
 ---
 
-## Personal Preferences
+## Tooling
 
-### Stack
-TypeScript/JavaScript + Python · Next.js (App Router) · Tailwind + ShadCN · Supabase · Vercel
+- **pnpm**, not npm or yarn
+- Commits: `type: description` (`feat`, `fix`, `refactor`, `docs`, `test`, `chore`)
+- PRs: always `--assignee @me`
+- Before opening a PR: `gh pr list --head <branch>`. Don't duplicate or push to a
+  merged branch
+- **Asking questions: always `AskUserQuestion`**, never options as plain text.
+  Non-negotiable. Load via ToolSearch if needed
 
-### Code Style
-- Concise, minimal, no unnecessary boilerplate
-- Comments only when logic isn't self-evident
-- Tabs for indentation
-- Check `components/ui/` before creating new components
-- Reuse a single shared component for repeated UI patterns (close buttons, modals, icons) — never one-off variants
-- When introducing a new reusable pattern, promote it to the shared layer after implementation
-- Provide immediate visual feedback after user actions — update or remove stale UI elements instantly, don't wait for background work
-- Maintain consistent UI patterns across similar component types (drawers, modals, detail panels) within the same app
+---
 
-### Tooling
-- Package manager: **pnpm** (not npm/yarn)
-- Commit format: `type: description` — `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
-- PR creation: always `--assignee @me`
-- **Asking questions**: always use `AskUserQuestion` — never list options as plain text. Non-negotiable. Load via ToolSearch if needed.
+## Code
 
-### Safety
-- Never expose env vars in code or logs
-- Secrets only in `.env.local` (never committed)
-- Never run `rm -rf`, `DROP`, `TRUNCATE`, or `db reset` without explicit confirmation
+- Tabs. Concise, no boilerplate. Comments only where the logic isn't self-evident
+- Check `components/ui/` before building a new component; reuse one shared component for
+  repeated patterns (close buttons, modals, icons) rather than one-off variants
+- Promote a new reusable pattern to the shared layer once it has a second caller
+- Give immediate visual feedback on user actions: update or clear stale UI at once;
+  don't wait on background work
+- Tests **after** implementation, not before. No TDD
 
-### Security (non-negotiable)
-- RLS on day one for all Supabase tables
-- Rate limiting: 100 req/hr/IP strict, loosen later
-- Sanitize inputs on backend; assume every input is malicious
-- CAPTCHA on registration/login/contact/password-reset (invisible mode)
+---
+
+## Database migrations
+
+- **Never `supabase db push` without reading `supabase migration list` first.** Push
+  applies every pending local migration, not just the one you wrote
+- **Write every migration idempotently**: `create table if not exists`,
+  `create or replace view`, `drop policy if exists` before `create policy`,
+  `cron.unschedule` before `cron.schedule`. Drift makes a re-run likely, and a re-run
+  should be harmless
+- **Applying SQL out-of-band puts you in debt.** The dashboard and the Supabase MCP
+  stamp their own timestamps. Commit the same SQL as a migration file and repair the
+  ledger in the same sitting, or the two histories silently diverge
+
+---
+
+## Recurring audits and routines
+
+- **One writer per file.** Before a routine files a finding, it reads the open PRs and
+  the resolved/completed section of the log it writes to. Two routines that both find
+  and both fix will collide on whatever lands second
+- **Log resolutions, not just findings.** The completed section is the only thing that
+  stops the next sweep re-finding a fixed item. When resolving a merge conflict between
+  two audit logs, union them and verify the union. A dropped completed entry comes back
+  as a duplicate later
+- **Name conflict-resolution branches `resolve/`.** Scratch branches like `pr-235-b` are
+  indistinguishable from real work a month later
+- **Cut a branch only when you have a commit for it.** Empty dated branches block
+  date-guarded routines from ever running again
+
+---
+
+## Safety
+
+- Never expose env vars in code or logs. Secrets only in `.env.local`, never committed
+- Never `rm -rf`, `DROP`, `TRUNCATE`, or `db reset` without explicit confirmation
+- **Never paste a live secret into chat.** Read it from the env file, or have Jesse set
+  it directly. A key pasted into a prompt is on disk in the transcript and has to be
+  rotated
+
+---
+
+## Security (non-negotiable)
+
+- RLS on day one for every Supabase table
+- Rate limiting: 100 req/hr/IP to start, loosen later
+- Sanitize inputs on the backend; assume every input is malicious
+- Invisible CAPTCHA on registration, login, contact, password reset
 - Review AI-generated code before merging
 
-### Design
-- Mobile-first
+---
+
+## Design
+
+Mobile-first. Design skills (`ui-ux-pro-max`, `frontend-design`, `ui-animation`,
+`web-design-guidelines`, `shadcn`) auto-trigger and carry their own rules.
+
+**Never**: Inter/Roboto/Arial, purple-gradient AI clichés, emojis as icons.
+**Always**: 4.5:1 contrast (WCAG AA), respect `prefers-reduced-motion`.
+
+Run `/design-inspo` before starting UI to pick 2-3 taste references. Anchors, not
+sources to copy tokens from.
 
 ---
 
-## Frontend Design
+## Shipping
 
-Installed design skills (`ui-ux-pro-max`, `frontend-design`, `taste-skill`, `ui-animation`, `web-design-guidelines`, `shadcn`) auto-trigger on frontend tasks and enforce quality — don't duplicate their rules here.
-
-Before starting UI, run `/design-inspo` to pick 2–3 taste references (never copy tokens from reference systems; use them as anchors).
-
-**Avoid**: Inter/Roboto/Arial, purple-gradient AI clichés, emojis as icons, cookie-cutter layouts. **Always**: 4.5:1 contrast (WCAG AA), respect `prefers-reduced-motion`.
-
----
-
-## Development Workflow
-
-- **Simple tasks** — skip planning, just implement
-- **Complex/ambiguous features** — follow `@workflows/create-prd.md` (plan → tasks → implement → verify → commit)
-- **Plan mode** — extreme concision, bullets over paragraphs, end with unresolved questions. Switch back to plan mode when things go sideways.
+- Verify with data. A shipped feature isn't an adopted one. Confirm real usage before
+  calling it a win
+- Complex or ambiguous features: `@workflows/create-prd.md` (plan, tasks, implement,
+  verify, commit)
 
 ---
 
-## What NOT to Do
+## Updating this file
 
-- Don't over-engineer tooling (no custom agent frameworks)
-- Don't use excessive MCPs — they clutter context
-- Don't wait for remote CI — run tests locally
-- Don't add features beyond what was asked
-- Don't create abstractions for one-time operations
-
----
-
-## Updating This File
-
-You have permission to suggest updates when you made a mistake a rule would have prevented, or found a pattern worth codifying. Keep it concise — verbose guidance wastes tokens.
+Suggest an update when you made a mistake a rule would have prevented, or found a
+pattern worth codifying. Before adding, check that the model doesn't already do it by
+default. If it does, the rule is noise. Verbose guidance wastes tokens.
