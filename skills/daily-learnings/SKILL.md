@@ -18,6 +18,27 @@ git rev-parse --verify feat/daily-learnings-<YYYY-MM-DD> 2>/dev/null
 git ls-remote --heads origin feat/daily-learnings-<YYYY-MM-DD>
 ```
 
+**Create the branch last, not first.** Cut it only once you have a commit to make. A
+branch cut up front and then left empty because the run found nothing does two bad
+things: it litters the repo, and it makes this very bail-out permanently block that
+date. Four such empty branches were sitting in this repo in August 2026.
+
+## Step 0b: Drain the learnings inbox
+
+`/learn` no longer writes universal rules into project CLAUDE.md files. It queues them
+here instead, so that global rules have exactly one author: this skill.
+
+```
+cat /Users/jesselusa/Documents/GitHub/claude/learnings-inbox.md
+```
+
+Treat each bullet as a candidate alongside the ones you extract from session logs, and
+put it through the same filter. When a bullet is resolved (promoted to a rule, or
+rejected), delete its line in the same commit that acts on it — leaving it queued means
+it gets re-proposed tomorrow.
+
+If the inbox file doesn't exist, there's nothing queued. Carry on.
+
 ## Step 1: Score past PR outcomes
 
 Read `evals/learning-agent/decisions.jsonl` in the claude repo. For every entry where `outcome` is `null`:

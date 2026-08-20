@@ -30,14 +30,23 @@ Report what was cleaned up before moving on.
 
 ---
 
-### 2. Session Learnings
+### 2. Session Learnings (conditional — skip most sessions)
 
-Run `/learn` — review the full session for patterns, mistakes, and decisions worth codifying.
+**Run `/learn` only if this session actually produced a rule.** That means a concrete
+mistake a written rule would have caught, or an explicit correction from the user about
+how to work. Routine sessions where things went fine produce no rule; say "no learnings"
+and move on.
 
-For each potential CLAUDE.md update, use `AskUserQuestion`:
+This gate exists because running `/learn` unconditionally at every session end, on top
+of the 09:00 `/daily-learnings` run, is what generated duplicate and near-duplicate
+instruction PRs. Volume was the problem, not quality.
+
+If the gate passes, `/learn` handles scope: project-specific rules go in this repo's
+CLAUDE.md, universal ones go to the inbox for `/daily-learnings`. Don't write global
+rules from here.
+
+For each proposed update, use `AskUserQuestion`:
 - Options: `Add to CLAUDE.md`, `Skip`, `Edit first`
-
-Apply approved changes immediately. Keep suggestions concise and actionable.
 
 ---
 
