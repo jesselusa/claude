@@ -30,6 +30,34 @@ Scan the session for:
 - Session-specific context (current task details, temporary state)
 - Information already in CLAUDE.md
 - Speculative conclusions from a single incident (unless clearly universal)
+- **Anything universal.** See "Scope" below — this is a hard boundary, not a preference.
+
+---
+
+## Scope: this skill writes to the PROJECT CLAUDE.md only
+
+Three routines can write instruction rules, and they used to overlap:
+
+| Routine | Writes to | Runs |
+|---|---|---|
+| `/learn` (this one) | the current repo's `CLAUDE.md` | end of session |
+| `/daily-learnings` | global `jesselusa/claude` `CLAUDE.md` | daily, 09:00 |
+| `/sync-claude-md` | global rules **out** to every project repo | on demand / after a global edit |
+
+A universal lesson written here arrives in the same repo twice: once from `/learn`,
+and again weeks later when `/sync-claude-md` pushes the global copy down. That is a
+duplicate-PR generator, and it is what produced colliding audit PRs in August 2026.
+
+**So: if a rule would apply to any other repo, do not write it here.** Append it to
+`~/Documents/GitHub/claude/learnings-inbox.md` instead, one bullet, with the date and
+the repo it came from. `/daily-learnings` drains that inbox on its next run and owns
+the decision about whether it becomes a global rule.
+
+Write here only what is true of *this repo and no other*: its architecture, its file
+layout, its naming, its build quirks.
+
+When in doubt, the inbox is the safe choice. A rule in the inbox gets considered once.
+A rule written to both places gets filed twice and someone has to resolve the collision.
 
 ## Execution Steps
 
@@ -40,6 +68,28 @@ cat ./CLAUDE.md
 ```
 
 If no CLAUDE.md exists, note that one should be created and proceed with suggestions.
+
+### 1b. Check what is already in flight
+
+Before proposing anything, find rules already filed and awaiting review:
+
+```bash
+gh pr list --state open --json number,title,headRefName \
+  --jq '.[] | select(.title | test("CLAUDE|learning|sync"; "i")) | "\(.number) \(.title)"'
+```
+
+For any hit, read its diff. **Hard skip** a learning that semantically matches an open
+PR, even if worded differently — that is a duplicate, and the second one will collide
+on merge.
+
+Then check the inbox so a lesson doesn't get queued twice:
+
+```bash
+grep -i "<keyword>" ~/Documents/GitHub/claude/learnings-inbox.md 2>/dev/null
+```
+
+This mirrors the CRITICAL FILTER that `/sync-claude-md` already applies. `/learn` was
+the one writer without it.
 
 ### 2. Review Session Context
 
@@ -98,4 +148,4 @@ After all learnings are reviewed:
 - Don't suggest things that are obvious or already standard practice
 - Prefer actionable instructions ("Always do X") over observations ("X is important")
 - Group related learnings when presenting to the user
-- If the same lesson applies to multiple projects, mention that it might also belong in the global CLAUDE.md
+- A lesson that applies to multiple projects goes in the inbox, never in this repo's CLAUDE.md. See "Scope" above.

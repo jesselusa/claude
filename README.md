@@ -40,13 +40,13 @@ Custom slash commands available after installation:
 | `/create-new-project` | Scaffold new project with templates, optional PRD, optional GitHub repo |
 | `/create-readme` | Generate README.md and LICENSE |
 | `/gitignore` | Generate .gitignore by project type |
-| `/git-cleanup` | Prune stale refs and delete merged local branches |
+| `/git-cleanup` | Delete branches whose PRs are merged (by PR state, not `--merged`) and prune abandoned worktrees |
 | `/kill-ports` | Find and kill processes on TCP ports |
 | `/robots` | Generate robots.txt with AI/SEO blocking |
 | `/sync-starter` | Sync content between projects and starter template |
 | `/commit-pr` | Lint → typecheck → commit → push → create PR on feature branch |
 | `/tasks` | View and update outstanding tasks in the tasks/ directory |
-| `/session-end` | End-of-session wrapper: runs /techdebt → /learn → /git-cleanup in sequence |
+| `/session-end` | End-of-session wrapper: /techdebt → /learn (only if the session produced a rule) → /git-cleanup |
 | `/setup-integration` | Scaffold third-party service setup (Stripe, Notion, Twilio, Cloudinary, Supabase) |
 | `/security-patch` | Check dependabot alerts across all repos, auto-patch, create PRs |
 | `/sync-claude-md` | Sync universal rules from global CLAUDE.md to all project repos, create PRs |
