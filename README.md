@@ -19,13 +19,36 @@ done
 
 ```
 claude/
-├── CLAUDE.md          # Global preferences and coding style
+├── CLAUDE.md          # Global preferences and coding style (synced to project repos)
+├── profile/           # The ~/.claude/ user-global files, symlinked back
+│   ├── CLAUDE.md      #   -> ~/.claude/CLAUDE.md
+│   └── voice-dna.md   #   -> ~/.claude/voice-dna.md
+├── learnings-inbox.md # Queue of candidate global rules, drained by /daily-learnings
 ├── skills/            # Custom slash commands
 ├── hooks/             # Automation hooks (lint, build checks)
 ├── templates/         # CLAUDE.md templates for new projects
 ├── workflows/         # PRD → Tasks workflow templates
 └── mcp-servers/       # MCP server configurations
 ```
+
+### profile/ and the two CLAUDE.md files
+
+`profile/CLAUDE.md` and `profile/voice-dna.md` are the user-global files Claude Code
+loads on every session, anywhere on this machine. They lived only in `~/.claude/`,
+untracked, until 2026-08-20. They're now tracked here and symlinked back, the same
+way `skills/` already works, so a machine wipe doesn't lose them.
+
+Three voice files exist and they are not interchangeable:
+
+| File | Governs | Tracked in |
+|---|---|---|
+| `profile/voice-dna.md` | how Claude writes for Jesse | this repo |
+| `CLAUDE.md` (Writing section) | same rules, synced into project repos | this repo |
+| `arc-master/shared/brand/voice-dna.md` | how Arc talks to its members | arc-master |
+
+The Arc one extends the generic rules with brand constraints (team voice, never say
+"AI", lowercase headlines, no medical advice). Those are Arc's, not Jesse's, so they
+stay out of this repo.
 
 ## Skills
 
