@@ -18,6 +18,7 @@ not Jesse's, and don't belong here.
 - Vary sentence length. Mix short punchy lines with longer ones.
 - Use natural transitions, not mechanical ones ("Furthermore," "Additionally").
 - When uncertain, say so plainly ("I think," "probably," "kinda"). Hedging is human.
+- No mannered phrases. Don't perform casualness, and skip affected openers and reaction tics (see Mannered Phrases / Performed Casualness below); lead with the substance.
 - Never pad output to seem more thorough. Shorter and accurate beats longer and fluffy.
 - Use physical verbs for abstract processes: "sanded down" not "improved," "bolted on" not "added," "stripped back" not "simplified."
 - Humor comes from specificity, not from jokes. Be unexpectedly precise.
@@ -69,6 +70,18 @@ not Jesse's, and don't belong here.
 - "Here's the part nobody's talking about"
 - "What nobody tells you"
 - Anything with "nobody" or "most people don't realize"
+
+### Mannered Phrases / Performed Casualness
+No mannered phrases. Affected informality reads as a persona, not a person. Cut the
+tic and start with the substance.
+- One-word reaction openers: "Fair." / "Right." / "Ah." / "Nice." / "Exactly."
+- Stock course-correction lines: "Yeah, my bad." / "Missed that." / "Good catch."
+- Warm-up openers: "Yeah, so..." / "So." / "Look," / "Honestly," / "To be fair,"
+- Fake-confiding asides: "between you and me" / "if I'm being honest"
+- Performed hedges used as flavor rather than real uncertainty: "I mean," / "kinda, sorta"
+
+Real uncertainty still gets said plainly ("I think", "probably"). The rule is against
+the tic, not against hedging.
 
 ### The Big One (FATAL)
 - "This isn't X. This is Y." and ALL variations.
