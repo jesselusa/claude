@@ -1,6 +1,6 @@
 ---
 name: design-inspo
-description: Pick 2-3 design systems from awesome-design-systems as taste references before building UI — inspiration only, not copying
+description: Anchor a new UI to 1-3 real design systems (use the user's own reference when supplied) — inspiration only, not copying
 argument-hint: [what you're building]
 ---
 
@@ -12,7 +12,7 @@ Goal: before designing a new UI, pick 1-3 real-world design systems to use as **
 
 ## Steps
 
-1. **Clarify the brief** — if $ARGUMENTS is vague or empty, use the `AskUserQuestion` tool to ask:
+1. **Clarify the brief** — if $ARGUMENTS is vague or empty, use the `AskUserQuestion` tool to ask only what is missing. If the user already supplied a reference, use it and skip step 2:
    - What are you building? (product type / page)
    - What mood? (e.g., serious/editorial, playful, utilitarian, luxury, technical)
    - Any brands whose feel you already like?
@@ -47,6 +47,9 @@ Goal: before designing a new UI, pick 1-3 real-world design systems to use as **
 
    **Avoid:** 2-3 anti-patterns for this specific project (e.g., "no purple gradients, no glassmorphism, no Inter").
 
+   **Content hierarchy:**
+   - For information-heavy UI, identify the primary thing the reader should understand. Repeat content only when the repetition serves a distinct purpose; keep secondary detail available without competing with the primary content.
+
    **Starting moves:**
    - Type: <suggested pairing direction, not exact fonts yet>
    - Color: <dominant + accent direction>
@@ -59,5 +62,5 @@ Goal: before designing a new UI, pick 1-3 real-world design systems to use as **
 
 - Inspiration only. Never copy exact colors, fonts, or component code from the reference systems.
 - Keep the brief short — it's an anchor, not a spec.
-- If the user already named brands they like in the prompt, skip straight to step 3.
+- If the user names a specific reference, don't make them pick from extra options unless they ask. Treat that reference as specific to this brief, not a universal aesthetic preference.
 - Prefer 2 references over 3. Two clear poles beat three muddy ones.
