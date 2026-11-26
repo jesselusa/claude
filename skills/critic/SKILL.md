@@ -26,19 +26,22 @@ If no `voice-dna.md` exists anywhere and the user wants one, offer to copy the t
 ## The loop
 
 1. **Load the draft.** Resolve $ARGUMENTS: a file (Read), a URL (WebFetch), "last"/empty (the previous assistant output), or inline text.
-2. **Load the voice file** and any sibling context.
+2. **Load the voice file** and any sibling context. Gather the original brief, the user's explicit assessment or must-keep wording, and any relevant sibling drafts available from the same batch. Pass only the context needed for the review; redact unrelated personal details.
 3. **Spawn a Critic sub-agent** via the Agent tool (`subagent_type: "general-purpose"`, `model: "opus"`, since this is a judgment call). The sub-agent's only job: review the draft against the voice file and return a verdict + specific feedback.
 4. **Revise** in the main session based on the feedback.
 5. **Re-run the Critic** on the revision.
 6. **Stop** when the Critic returns "Excellent" or after 3 rounds, whichever comes first. Show the final version.
 
-## Critic sub-agent prompt (use this verbatim, filling in `<DRAFT>` and `<VOICE_FILE_CONTENTS>`)
+## Critic sub-agent prompt (use this verbatim, filling in the three placeholders; use "None available" for absent review context)
 
 ```
 You are a Critic. Your only job is to review the draft below against the voice rules and samples, and return specific, actionable feedback.
 
 ## Voice and context
 <VOICE_FILE_CONTENTS>
+
+## Review context
+<REVIEW_CONTEXT>
 
 ## Draft to review
 <DRAFT>
@@ -47,7 +50,7 @@ You are a Critic. Your only job is to review the draft below against the voice r
 
 ### Voice match
 - Does this read like the writing samples? Same rhythm, sentence length, formality?
-- Any banned phrases present? Check every single one in the banned list.
+- Any banned phrases present? Check every single one in the banned list. Don't remove wording the user explicitly wants to keep merely because it appears there; flag the conflict.
 - Does it use words and constructions the samples use?
 - Would someone who knows this person recognize their voice?
 
@@ -55,6 +58,8 @@ You are a Critic. Your only job is to review the draft below against the voice r
 - Does it actually answer what was asked, or an adjacent version?
 - Are claims specific and grounded, or vague and generic?
 - Is anything padded or restated in different words to seem thorough?
+- Does the draft preserve the user's explicit judgment, reservations, and uncertainty without softening or inflating them?
+- When reviewing a batch, compare openings, closers, and paragraph structure with sibling drafts. Flag formulaic repetition unless it serves the genre or the user's stated format. Don't force variety where it would distort substance.
 
 ### Final bar
 - Would the user send, publish, or present this without editing?

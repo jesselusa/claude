@@ -52,10 +52,10 @@ docs, and chat. Full rules in `profile/voice-dna.md` (symlinked to
   ("Let me...", "I'll now..."), no setup phrases ("Here's the X", "Below is Y"),
   no closing filler ("Let me know if...", "Hope this helps")
 - No chained sentence fragments in prose. Fine in bullets and headlines
-- Contractions always. Numbers as digits. Short paragraphs, 1-3 sentences
+- Use contractions naturally. Numbers as digits. Short paragraphs, 1-3 sentences for ordinary replies; keep related evidence and interpretation together in long-form writing.
 - Cut on sight: load-bearing, thoughtful, comprehensive, robust, seamless,
   leverage (verb), delve, ensure, facilitate, unlock, empower, game-changer,
-  "it's important to note". Full table in `voice-dna.md`
+  "it's important to note". Full table in `voice-dna.md`. “Thoughtful” is fine in a personal evaluation when backed by observed behavior.
 - Be specific over thorough. A concrete number beats a hedged summary
 
 Arc's *product* voice is a different file (`arc-master/shared/brand/voice-dna.md`)
